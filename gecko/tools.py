@@ -46,25 +46,73 @@ def update_step_matrices(extSyst, **kargs):
     N = extSyst.matrices[-1].shape[0]
     count = kargs["count"]
     
-    preview_times = count + np.arange(N)
-    
     if "step_times" in kargs.keys():
         step_times = kargs["step_times"]
-        next_steps = step_times[(step_times >= count) * 
-                                (step_times < count+N-1)]
+        regular_time = None
         
     elif "regular_time" in kargs.keys():
         regular_time = kargs["regular_time"]
-        next_steps = np.array([time for time in preview_times
-                      if not time%regular_time and time < count+N-1])
+        step_times = None
         
     else:
         raise KeyError("This funtion needs either 'step_times' or "+
                        "'regular_time', but the kargs "+
                        "introduced are {}".format(kargs.keys()))
         
-    U = (preview_times.reshape([N, 1]) > next_steps).astype(int)
+    U = plan_steps(count, N, step_times, regular_time)
     extSyst.matrices[0] = U[:, :, None]
+    
+def plan_steps(count, N, step_times=None, regular_time=None):
+    
+    preview_times = count + np.arange(N)
+    
+    if step_times is not None:
+        next_steps = step_times[(step_times >= count) * 
+                                (step_times < count+N-1)]
+        
+    elif regular_time is not None:
+        next_steps = np.array([time for time in preview_times
+                               if not time%regular_time and time < count+N-1])
+    else:
+        msg = "either the step_times or some "+\
+        "regular_time for steps must be provided"
+        raise AssertionError(msg)
+        
+    E = (preview_times.reshape([N, 1]) > next_steps).astype(int)
+    
+    return E
+
+def update_stepping_area(box, **kargs):
+    next_centers = find_step_centers(kargs["step_count"],
+                                     kargs["n_next_steps"],
+                                     kargs["xy_lenght"])
+    
+    for limit in box.constraints:
+        limit.update(center = next_centers)
+                
+def find_step_centers(step_count, n_next_steps, xy_lenght):
+    side = (-1)**step_count 
+    alterned = np.tile([[1], [-1]],
+                       [n_next_steps//2+1, 1])[:n_next_steps]
+    
+    return side * alterned * xy_lenght
+
+def reduce_by_time(box, **kargs):
+    current_swing_pose = kargs["current_swing_pose"]
+    current_ss_time = kargs["current_ss_time"]
+    step_duration = kargs["step_duration"]
+    
+    new_center = current_swing_pose.get_translation()[:2]
+    box.move_TS_box(new_center)
+    
+    scale = (step_duration-current_ss_time)/step_duration
+    box.scale_box(scale)
+    
+def make_simetric_vertices(xy_corner):
+    x_values = np.array([1, -1, -1, 1])[:, None] * xy_corner[0]
+    y_values = np.array([1, 1, -1, -1])[:, None] * xy_corner[1]
+    
+    return np.hstack([x_values, y_values])
     
 def get_system_matrices(system):
     """
@@ -183,3 +231,6 @@ def discretize(G, *H):
     B = tuple([sy.integrate(sy.exp(G * t_), (t_, 0, T_), conds="none") * h for h in H])
 
     return (A, *B)    
+
+def do_not_update(sys, **kargs):
+    return None

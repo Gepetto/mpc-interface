@@ -6,12 +6,62 @@ Created on Tue Feb  1 19:56:04 2022
 @author: nvilla
 """
 import numpy as np
-import tools as use
-from combinations import LineCombo
+import gecko.tools as use
+from gecko.combinations import LineCombo
+from collections.abc import Iterable
 
-## TODO: Class for solitary domain such as "n"
+class DomainVariable:
+    def __init__(self, names, sizes, axes = None, time_variant = False,
+                 how_to_update_size=None):
+        names = names if isinstance(names, (Iterable, str)) else [names]
+        sizes = sizes if isinstance(sizes, Iterable) else [sizes]
+        self.axes = axes
+        
+        self.identify_domain(names)
+        self.set_sizes(names, sizes)
+        
+        self.definitions = {}
+        self.make_definitions()
+    
+        self.time_variant = time_variant
+        if how_to_update_size is None or not time_variant:
+            self.__figuring_out = use.do_not_update
+        else:
+            self.__figuring_out = how_to_update_size
+            
+    def identify_domain(self, names):
+        domain_ID = {name:index for index, name in enumerate(names)}
+        
+        if self.axes is None:
+            self.domain_ID = domain_ID
+        else:
+            self.domain_ID = {}
+            for axis in self.axes:
+                self.domain_ID.update({
+                        name+axis:ID for name, ID in domain_ID.items()
+                        })
+            
+    def set_sizes(self, names, sizes):
+        self.domain = {name:sizes[ID] for name, ID in self.domain_ID.items()}
+        self.all_variables = self.domain
+            
+    def update_sizes(self, **kargs):
+        self.__figuring_out(self, **kargs)
 
-
+    def make_definitions(self):
+        for variable, size in self.domain.items():
+            combination = {variable:np.eye(size)}
+            self.definitions.update({variable:LineCombo(combination)})
+            self.definitions[variable]._coefficients = ["I"]
+        
+    def update_definitions(self):
+        for variable, size in self.domain.items():
+            self.definitions[variable].matrices[0] = np.eye(size)
+            
+    def update(self, **kargs):
+        self.update_sizes(**kargs)
+        self.update_definitions()              
+        
 class ControlSystem:
     def __init__(self, input_names, state_names, A, B, axes=None,
                  time_variant=False, how_to_update_matrices=None):
@@ -23,8 +73,8 @@ class ControlSystem:
         
         self.axes = axes
         self.time_variant = time_variant
-        if how_to_update_matrices is None or time_variant is None:
-            self.__figuring_out = (lambda self:None)
+        if how_to_update_matrices is None or not time_variant:
+            self.__figuring_out = use.do_not_update
         else:
             self.__figuring_out = how_to_update_matrices
             
@@ -49,8 +99,10 @@ class ControlSystem:
         self.T = T; self.w = w
         
         return self
-          
-## TODO: hacer tests para todas las clases.
+
+## TODO: S and U are 3D matrices, but allow introducing 2D matrices when the number of states is 1 by adding internally the [:, :, None]
+## TODO: if U is not a list, make it a list internally...        
+## TODO: Report some how what should be in the **kargs for update functions
 ## TODO: (no por ahora) Tambien seria mas simple si hago funciones para actualizar cada definicion por ella misma si es time_variant
 ## TODO: (no por ahora) Seria preferible introducir directamente variables y matrices en las definiciones.
 class ExtendedSystem:
@@ -81,13 +133,13 @@ class ExtendedSystem:
         
         self.time_variant = time_variant
         
-        if how_to_update_matrices is None:
-            self.__figuring_out = (lambda self:None)
+        if how_to_update_matrices is None or not time_variant:
+            self.__figuring_out = use.do_not_update
         else:
             self.__figuring_out = how_to_update_matrices
             
     @classmethod         
-    def extend_cotrol_system(cls, control_system, state_vector_name,
+    def from_cotrol_system(cls, control_system, state_vector_name,
                              horizon_lenght):
         
         S, U = use.extend_matrices(horizon_lenght, control_system.A, 
@@ -95,7 +147,8 @@ class ExtendedSystem:
         if control_system.time_variant:
             def how_to_update_matrices(ext_syst, **kargs):
                 """ This function requires a key argument called 
-                'control_system' that is an instance of ControlSystem
+                'control_system' that is the instance of ControlSystem
+                extended to obtain this extended control system
                 """
                 ctr_syst = kargs["control_system"]
                 ctr_syst.update_matrices(**kargs)
@@ -132,33 +185,36 @@ class ExtendedSystem:
                         })
             
     def set_sizes(self):
-        state_sizes2 = {state:self.matrices[-1].shape[0] 
+        state_sizes = {state:self.matrices[-1].shape[0] 
                         for state, ID in self.state_ID.items()}
         self.domain = {base:self.matrices[ID].shape[1] 
                        for base, ID in self.domain_ID.items()}
-        self.all_variables = {**self.domain, **state_sizes2}
+        self.all_variables = {**self.domain, **state_sizes}
         
     def update_sizes(self):
-        for variable, ID in self.domain_ID.items():
-            self.domain[variable] = self.matrices[ID].shape[1]
-
-        self.all_variables.update(self.domain)
+        if self.time_variant:
+            for variable, ID in self.domain_ID.items():
+                self.domain[variable] = self.matrices[ID].shape[1]
+    
+            self.all_variables.update(self.domain)
         # the state sizes (correspondig to the horizon lenght) are fixed.
             
     def make_definitions(self):
         for variable, size in self.domain.items():
             combination = {variable:np.eye(size)}
             self.definitions.update({variable:LineCombo(combination)})
+            self.definitions[variable]._coefficients = ["I"]
             
         for variable, sID in self.state_ID.items():
             if self.axes is None:
-                comb2 = {base:self.matrices[dID][..., sID]
+                comb = {base:self.matrices[dID][..., sID]
                         for base, dID in self.domain_ID.items()}
             else:
-                comb2 = {base:self.matrices[dID][..., sID]
+                comb = {base:self.matrices[dID][..., sID]
                         for base, dID in self.domain_ID.items()
                         if base[-2:] == variable[-2:]}
-            self.definitions.update({variable:LineCombo(comb2)})
+            self.definitions.update({variable:LineCombo(comb)})
+            self.definitions[variable]._coefficients = ["U", "S"]
             
     def update_definitions(self):
 #This should be reformulated: definitions should have a fixed update method that
