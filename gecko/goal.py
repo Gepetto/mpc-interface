@@ -106,15 +106,14 @@ class Cost:
                 
             else: self.t = None; self.m = None; self.nlines = None
             
-        if aim is not None or L is not None:
+        if L is not None:
             self.compute_matrices()
             
     def compute_matrices(self):
         if self.L:
-            self.matrices = [self.weight*l 
-                             for l in self.L]
+            self.matrices = self.L
         else:
-            self.matrices = [self.weight]*self.axes_len
+            self.matrices = [1]*self.axes_len
 
     def broadcast(self):
         if self.L or self.schedule:

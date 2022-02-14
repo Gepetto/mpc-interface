@@ -7,6 +7,7 @@ Created on Tue Feb  1 19:45:36 2022
 """
 import numpy as np
 import sympy as sy
+from cricket import closed_loop_tools as clt
 
 
 def extend_matrices(N, A, B):
@@ -72,14 +73,14 @@ def plan_steps(count, N, step_times=None, regular_time=None):
         
     elif regular_time is not None:
         next_steps = np.array([time for time in preview_times
-                               if not time%regular_time and time < count+N-1])
+                               if not (time+1)%regular_time 
+                               and time < count+N-1])
     else:
         msg = "either the step_times or some "+\
         "regular_time for steps must be provided"
         raise AssertionError(msg)
         
     E = (preview_times.reshape([N, 1]) > next_steps).astype(int)
-    
     return E
 
 def update_stepping_area(box, **kargs):
@@ -91,22 +92,35 @@ def update_stepping_area(box, **kargs):
         limit.update(center = next_centers)
                 
 def find_step_centers(step_count, n_next_steps, xy_lenght):
-    side = (-1)**step_count 
+    side = (-1)**(step_count+1) 
     alterned = np.tile([[1], [-1]],
                        [n_next_steps//2+1, 1])[:n_next_steps]
     
-    return side * alterned * xy_lenght
+    centers = np.hstack([np.ones([n_next_steps, 1])*xy_lenght[0],
+                         side * alterned * xy_lenght[1]])
+    return centers
 
 def reduce_by_time(box, **kargs):
     current_swing_pose = kargs["current_swing_pose"]
     current_ss_time = kargs["current_ss_time"]
     step_duration = kargs["step_duration"]
+    landing_advance = kargs["landing_advance"]
     
     new_center = current_swing_pose.get_translation()[:2]
     box.move_TS_box(new_center)
     
-    scale = (step_duration-current_ss_time)/step_duration
+    s = (step_duration-landing_advance-current_ss_time)/(step_duration-landing_advance)
+    scale = s if s > 0 else 1e-8 
     box.scale_box(scale)
+    
+def recenter_on_real_state_x(box, **kargs):
+    box.move_SS_box(new_center = kargs["x0_x"])
+            
+def recenter_on_real_state_y(box, **kargs):
+    box.move_SS_box(new_center = kargs["x0_y"])
+    
+def recenter_support(box, **kargs):
+    box.move_TS_box(new_center = kargs["s0"])
     
 def make_simetric_vertices(xy_corner):
     x_values = np.array([1, -1, -1, 1])[:, None] * xy_corner[0]
@@ -199,7 +213,7 @@ def get_system_variables(system):
         state_variables = ["CoM", "CoM_dot", "CoM_ddot"]
 
     return input_variables, state_variables
-    
+
 def discretize(G, *H):
     """
     This function takes the matrices G and H = [h1, h2, ... ] from a

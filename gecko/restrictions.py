@@ -224,7 +224,7 @@ class Constraint:
                              for i, bound in enumerate(bounds))
         return text
                 
-    
+## TODO: The axes should also be an atribute of the box
 class Box:
     def __init__(self, time_variant=None, how_to_update=None):
         
@@ -234,6 +234,7 @@ class Box:
         self.rotation = [np.array([])]
         self.scale_factor = np.array([1.])
         self.schedule = range(0)
+        self.safety_margin = 0
         
         self.time_variant = time_variant
         
@@ -292,7 +293,14 @@ class Box:
             boundary.update(extreme = boundary.extreme * 
                                       scale_factor/self.scale_factor)
         self.scale_factor = scale_factor
-            
+        
+    def set_safety_margin(self, margin):
+        
+        for boundary in self.constraints:
+            boundary.update(extreme = boundary.extreme - 
+                            margin*np.linalg.norm(boundary.arrow))
+        self.safety_margin = margin
+        
     def update(self, **kargs): 
         self.__figuring_out(self, **kargs)
         

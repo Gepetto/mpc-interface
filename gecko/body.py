@@ -185,6 +185,8 @@ class Formulation:
             if i == 0:
                 Mg = np.array(combination[var]).dot(self.PM[var][0])
                 Mo = np.array(combination[var]).dot(self.PM[var][1])
+                if len(Mg.shape) == 1:
+                    Mg = Mg[None, :]; Mo = Mo[None, :]
             else:
                 Mg += np.array(combination[var]).dot(self.PM[var][0])
                 Mo += np.array(combination[var]).dot(self.PM[var][1])
@@ -246,8 +248,8 @@ class Formulation:
             else:
                 cMg = c * Mg[schedule]; cMo = c * Mo[schedule]
             
-            Q += cMo.T @ cMo
-            q += cMo.T @ (cMg @ given - cost.aim[:, i])
+            Q += cost.weight * cMo.T @ cMo
+            q += cost.weight * cMo.T @ (cMg @ given - cost.aim[:, i])
         
         return Q, q
     

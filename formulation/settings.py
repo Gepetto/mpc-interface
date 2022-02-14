@@ -33,7 +33,7 @@ foot_rising = 0.1
 ## DATA for BOXES
 foot_corner = np.array([0.1, 0.06])
 stepping_corner = np.array([0.5, 0.2])
-stepping_center = np.array([0, 0.005+2*foot_corner[1]+2*stepping_corner[1]])
+stepping_center = np.array([0, 0.08+2*foot_corner[1]+stepping_corner[1]])
 
 
 w = np.sqrt(gravity/zk[0])
@@ -43,14 +43,15 @@ always_horizontal_ground = True
 
 cost_weights = {"minimize jerk": 0.0001,
                 "track velocity": 0.01,
-                "relax ankles": 0.1}
+                "relax ankles": 0.5}
 
-target_vel = np.array([.2, 0, 0]).T
+target_vel = np.array([0.2, 0, 0]).T
 
 with_orientation = False
 
 system_name = "J->CCC"
 
-optimization_domain = ["CoM_dddot_x", "Ds_x", "CoM_dddot_y", "Ds_y"]
-
+optimization_domain = ["CoM_dddot_x", "Ds_x", "CoM_dddot_y", "Ds_y", "x0_x", "x0_y"]
+takeoff_delay = 0.05  
+landing_advance = 0.05 + ds_duration
 

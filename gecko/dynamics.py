@@ -97,6 +97,7 @@ class ControlSystem:
         
         self.get_A = get_A; self.get_B = get_B
         self.T = T; self.w = w
+        self.system_name = system_name
         
         return self
 
@@ -143,7 +144,7 @@ class ExtendedSystem:
                              horizon_lenght):
         
         S, U = use.extend_matrices(horizon_lenght, control_system.A, 
-                               control_system.B)
+                                                   control_system.B)
         if control_system.time_variant:
             def how_to_update_matrices(ext_syst, **kargs):
                 """ This function requires a key argument called 
