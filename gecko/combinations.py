@@ -18,8 +18,9 @@ class LineCombo:
             self.__figuring_out = how_to_update
         
         self._coefficients = ["C"+str(i) for i in range(len(variables))]
-        
-    def update(self): self.__figuring_out(self)
+    
+    def update(self, **kargs): 
+        self.__figuring_out(self, **kargs)
     
     def __getitem__(self, variable):
         return self.matrices[self.variables.index(variable)]

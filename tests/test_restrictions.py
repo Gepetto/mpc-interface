@@ -113,32 +113,63 @@ class RestrictionsTestCase(unittest.TestCase):
         self.assertEqual(self.limit4.extreme.shape[0], 5)
         self.limit4.update(L = np.ones([5, 10]))
         
-    def test_box(self):
+    def test_is_feasible(self):
         
-#        SSbox = Box()
+        self.assertTrue(not self.limit1.is_feasible(-20))
+        self.assertTrue(self.limit1.is_feasible(9))
+        self.assertTrue(self.limit1.is_feasible(-10+1e-6))
+        self.assertTrue(not self.limit1.is_feasible(-10-1e-6))
+        self.assertTrue(not self.limit1.is_feasible(-10))
+        
+        points_3 = [np.array([1, 1]), 
+                    np.array([1, 0.8]), 
+                    np.array([0, (-10+1e-4)/7]),
+                    np.array([-1.3, 1])]
+        
+        self.assertEqual([True, True, False, True], 
+                         self.limit3.is_feasible(points_3))
+        
+        points_4 = [-np.ones([11, 3]), np.zeros([11, 3])]
+        
+        self.assertTrue(all([[np.zeros([5, 2]).astype(bool), 
+                              np.ones([5, 2]).astype(bool)],
+                             self.limit4.is_feasible(points_4)]))
+        
+    def test_box(self):
         
         vertices = np.array([[0, 1], [1, 0], [0, -1], [-1, 0]])
         SSbox = Box.state_space("CoM", vertices, ["_x"])
-        
-        normal_directions = np.array([[ 1,  1], 
-                                      [-1, -1], 
-                                      [ 1, -1], 
-                                      [-1,  1]])
+            
         for limit in SSbox.constraints:
-            self.assertTrue(np.any(
-                    np.all(limit.L == normal_directions,
-                           axis=1)))
+            
+            self.assertTrue(np.round(np.linalg.norm(limit.L), 8) == 1)
             self.assertTrue(limit.arrow in [1, -1])
             self.assertTrue(limit.extreme > 0)
             self.assertTrue((limit.center == np.array([0, 0])).all())
         
-        SSbox.move_SS_box([1, 55])
-        for limit in SSbox.constraints:
-            self.assertTrue((limit.center == [54, 56, -54, -56]).any())
+        SSbox.move_SS_box([1, 2])
         
-        SSbox.scale_box(1.5)
+        true_points = [np.reshape([1e-5, 2], [-1, 1]), 
+                       np.reshape([1, 1+1e-5], [-1, 1]),
+                       np.reshape([1, 3-1e-5], [-1, 1]),
+                       np.reshape([2-1e-5, 2], [-1, 1]),
+                       np.reshape([1, 2], [-1, 1])]
+        
+        false_points = [np.reshape([-1e-5, 2], [-1, 1]), 
+                        np.reshape([1, 1-1e-5], [-1, 1]),
+                        np.reshape([1, 3+1e-5], [-1, 1]),
+                        np.reshape([2+1e-5, 2], [-1, 1]),
+                        np.reshape([0, 0], [-1, 1])]
+        
+        self.assertTrue(all(SSbox.is_feasible(true_points)))
+        self.assertTrue(not all(SSbox.is_feasible(false_points)))
+        
         for limit in SSbox.constraints:
-            self.assertTrue(limit.extreme == 1.5)
+            self.assertTrue((np.round(np.abs(limit.center), 4) == [2.1213, 0.7071]).any())
+        
+        SSbox.scale_box(np.sqrt(2))
+        for limit in SSbox.constraints:
+            self.assertTrue(limit.extreme == 1.)
         
         
 if __name__ == "__main__":

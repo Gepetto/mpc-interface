@@ -7,8 +7,7 @@ Created on Tue Feb  1 19:45:36 2022
 """
 import numpy as np
 import sympy as sy
-from cricket import closed_loop_tools as clt
-
+#from cricket import closed_loop_tools as clt
 
 def extend_matrices(N, A, B):
     n, m = B.shape
@@ -63,6 +62,7 @@ def update_step_matrices(extSyst, **kargs):
     U = plan_steps(count, N, step_times, regular_time)
     extSyst.matrices[0] = U[:, :, None]
     
+    ### TODO: add if count is None --> count=0 to take step_times that are refered to the present.
 def plan_steps(count, N, step_times=None, regular_time=None):
     
     preview_times = count + np.arange(N)
@@ -73,7 +73,7 @@ def plan_steps(count, N, step_times=None, regular_time=None):
         
     elif regular_time is not None:
         next_steps = np.array([time for time in preview_times
-                               if not (time+1)%regular_time 
+                               if not (time+2)%regular_time     # +1 was in the parenthesis
                                and time < count+N-1])
     else:
         msg = "either the step_times or some "+\
@@ -110,7 +110,7 @@ def reduce_by_time(box, **kargs):
     box.move_TS_box(new_center)
     
     s = (step_duration-landing_advance-current_ss_time)/(step_duration-landing_advance)
-    scale = s if s > 0 else 1e-8 
+    scale = s if s > 0 else 1e-2 
     box.scale_box(scale)
     
 def recenter_on_real_state_x(box, **kargs):
@@ -127,7 +127,11 @@ def make_simetric_vertices(xy_corner):
     y_values = np.array([1, 1, -1, -1])[:, None] * xy_corner[1]
     
     return np.hstack([x_values, y_values])
-    
+
+def adapt_size(lc, steps):
+    var = "Ds"+lc.variables[0][-2:]
+    lc.matrices[lc.variables.index(var)] = steps.definitions[var].matrices[0][0]
+              
 def get_system_matrices(system):
     """
 
@@ -166,7 +170,7 @@ def get_system_matrices(system):
     elif system == "J->CCC":
         A = sy.Matrix([[0, 1, 0], [0, 0, 1], [0, 0, 0]])
         B = sy.Matrix([0, 0, 1])
-        parameters = ("tau", "omega", "*args")
+        parameters = ("tau", "*args")
 
     A_, B_ = sy.simplify(discretize(A, B))
 

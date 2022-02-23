@@ -101,6 +101,7 @@ class ControlSystem:
         
         return self
 
+## TODO: incorporate additional definition --> for variables that must be updated based on the system matrices.
 ## TODO: S and U are 3D matrices, but allow introducing 2D matrices when the number of states is 1 by adding internally the [:, :, None]
 ## TODO: if U is not a list, make it a list internally...        
 ## TODO: Report some how what should be in the **kargs for update functions

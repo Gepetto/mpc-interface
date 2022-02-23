@@ -204,6 +204,25 @@ class Constraint:
         
         if arrow is not None or L is not None:
             self.compute_matrices()
+    
+    def is_feasible(self, points):
+        """ Introduce a list of points to verify the feasibility of each
+        one separately, or introduce a np.vstack of row points to check 
+        feasibility along the time horizon. Or a list of np.stacks if 
+        prefered.
+        for evaluations along hte horizon, points are considered to ve at the 
+        scheduled times.
+        """
+        if isinstance(points, list):
+            return [self._is_feasible(point) for point in points]
+        else:
+            return self._is_feasible(points)
+        
+    def _is_feasible(self, point):
+        if self.L:
+            ts_point = np.vstack([(l@p.T) for l, p in zip(self.L, point.T)]).T
+            return self.arrow*(ts_point - self.center) < self.extreme
+        return np.sum(self.arrow*(point - self.center), axis=1) < self.extreme
             
     def __str__(self):
         return self.__repr__()
@@ -213,16 +232,30 @@ class Constraint:
             axes = "_"+"".join(axis[1:] for axis in self.axes)
         else:
             axes = ""
-        bounds = self.bound()
-        if bounds.shape[0] == 1:
-            timing = "limits of the form:\n"
-            text = timing + "\n".join("\t"+"arrow @ " + self.variable+axes +
-                                      " < "+str(bound[0]) for bound in bounds)   
-        else:
-            text = "\n".join("limit {}:\t\t".format(i)+"arrow @ " + 
-                             self.variable + axes + " < "+str(bound[0]) 
-                             for i, bound in enumerate(bounds))
+        
+        text = "\nvariable: "+ self.variable+axes 
+        text+= "\nwith L = " +str(",\n".join(str(l) for l in self.L)) if self.L != [] else ""
+        text+= "\n\t\t\t\t\tarrow: "+ (" "*7).join(str(arrow) for arrow in self.arrow)
+        text+= "\n\t\t\t\t\tcenter: "+ (" "*8).join(str(center) for center in self.center)
+        text+= "\n\t\t\t\t\textreme: "+ (" "*9).join(str(extreme) for extreme in self.extreme)
+        text+= "\n"
         return text
+    
+#    def __repr__(self):
+#        if self.axes != [""]:
+#            axes = "_"+"".join(axis[1:] for axis in self.axes)
+#        else:
+#            axes = ""
+#        bounds = self.bound()
+#        if bounds.shape[0] == 1:
+#            timing = "limits of the form:\n"
+#            text = timing + "\n".join("\t"+"arrow @ " + self.variable+axes +
+#                                      " < "+str(bound[0]) for bound in bounds)   
+#        else:
+#            text = "\n".join("limit {}:\t\t".format(i)+"arrow @ " + 
+#                             self.variable + axes + " < "+str(bound[0]) 
+#                             for i, bound in enumerate(bounds))
+#        return text
                 
 ## TODO: The axes should also be an atribute of the box
 class Box:
@@ -273,12 +306,13 @@ class Box:
         return box
         
     def move_SS_box(self, new_center):
-        self.center = new_center
+        assert np.shape(new_center)[-1] == self.constraints[0].L[0].shape[-1] # TODO: Save the dimention of the TS and SS in the box to avoid taking it from the first constraint
+        self.center = np.array(new_center)
         for boundary in self.constraints:
             center = np.sum(boundary.L*np.array(new_center), 
                             axis=1).reshape([-1, 1])
             boundary.update(center=center)
-    
+    ## TODO: These functions should be "move_in_SS" and "move_in_TS"
     def move_TS_box(self, new_center):
         self.center = new_center
         for boundary in self.constraints:
@@ -300,13 +334,25 @@ class Box:
             boundary.update(extreme = boundary.extreme - 
                             margin*np.linalg.norm(boundary.arrow))
         self.safety_margin = margin
+    ## TODO: Make functions"is_feasible_SS" and "is_feasible_TS" to ask for points in any representation
+    def is_feasible(self, points):
+        if not isinstance(points, list):
+            points = [points]
+        
+        feasible = []
+        for point in points:
+            feasible.append(all(
+                    [limit.is_feasible(point) 
+                    for limit in self.constraints]
+                    ))
+        return feasible
         
     def update(self, **kargs): 
         self.__figuring_out(self, **kargs)
         
 def box_boundaries(vertices):
     """ vertices is an ndarray with one vertex per row."""
-    
+    vertices = vertices.astype("float64")
     n, dim = vertices.shape
     center = np.sum(vertices, axis=0)/n
     
@@ -337,7 +383,10 @@ def box_boundaries(vertices):
                              d0[:, 0]*d1[:, 2]).reshape(-1, 1),
                             (d0[:, 0]*d1[:, 1]-
                              d0[:, 1]*d1[:, 0]).reshape(-1, 1)])
-                         
+
+    for i, arrow in enumerate(arrows):
+        arrows[i] = arrow/np.linalg.norm(arrow)
+        
     furthest_vertex = vertices[simplices[:, 0]]
     extremes = np.sum(arrows * (furthest_vertex - center), 
                       axis=1).reshape([-1, 1])

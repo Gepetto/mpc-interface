@@ -173,11 +173,6 @@ class Formulation:
                                  "seems to not be given nor optimal.")
         return Mg, Mo
     
-## TODO: This function initializes Mg and Mo according to i=0. It can happen that 
-#        after with bigger i, the shape becomes non broadcastable:
-#        typically the difference between (N,) and (1, N) which are the same,
-#        but python complies. Solve this issue. I temporarly solved it by making
-#        definitions with factors in or out a list: [factor] or factor
     def get_matrices_from_definition(self, variable):
         
         combination = self.definitions[variable]
@@ -198,9 +193,11 @@ class Formulation:
         variables, and maybe for all the qp_domain.
         All values must be provided as ndarrays with one single column"""
         
-        if self.given_ID:
-            given = np.vstack([collector[variable]
-                               for variable in self.given_ID])
+        if self.given_len:
+            given = np.zeros([self.given_len, 1])
+            for variable, indices in self.given_ID.items():
+                given[indices] = collector[variable]
+            
         else:
             given = np.array([])
         return given
