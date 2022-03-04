@@ -15,14 +15,14 @@ def extend_matrices(N, A, B):
     s = np.zeros([n * N, n])
     u = np.zeros([n * N, N, m])
 
-    s[0:n, :] = np.copy(A)
-    u[0:n, 0, np.newaxis, :] = np.copy(B.reshape([n, 1, m]))
+    s[0:n, :] = A
+    u[0:n, 0, :] = B
 
     for i in range(1, N):
         u[n * i : n * (i + 1), 0:i, :] = np.dstack(
             [A.dot(u[n * (i - 1) : n * i, 0:i, j]) for j in range(m)]
         )
-        u[n * i : n * (i + 1), i, np.newaxis, :] = np.copy(B.reshape([n, 1, m]))
+        u[n * i : n * (i + 1), i, :] = B
 
         s[n * i : n * (i + 1), :] = A.dot(s[n * (i - 1) : n * i, :])
 
@@ -111,6 +111,7 @@ def reduce_by_time(box, **kargs):
     
     s = (step_duration-landing_advance-current_ss_time)/(step_duration-landing_advance)
     scale = s if s > 0 else 1e-2 
+    
     box.scale_box(scale)
     
 def recenter_on_real_state_x(box, **kargs):
