@@ -37,7 +37,7 @@ class LineCombo:
     def __str__(self):
         return self.__repr__()
     
-    def __repr__(self):
+    def __repr__(self):# TODO: this visualization is not correct.
         
         comb_text =" + ".join(coef+" ( "+var+" )" 
                               for coef, var in zip(self._coefficients,

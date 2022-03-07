@@ -8,12 +8,15 @@ Created on Wed Feb  2 10:35:54 2022
 
 
 import unittest
+import matplotlib.pyplot as plt
+from matplotlib import colors
 
 import numpy as np
 from collections.abc import Iterable
 
 import gecko.dynamics as dy
 import gecko.tools as use
+import pickle as pick
 
 class DynamicsTestCase(unittest.TestCase):
     def setUp(self):
@@ -104,6 +107,23 @@ class DynamicsTestCase(unittest.TestCase):
         self.assertTrue((LIP.A==correctA).all())
         self.assertTrue((LIP.B==correctB).all())
         
+    def test_extended_matrices(self):
+        file = open("LIP_matrices", "rb")
+        saved_matrices = list(next(saved_data(file)).values())[0]
+        file.close()
+        
+        LIP = dy.ControlSystem.from_name(system_name = 'J->CCC',
+                                      discretization_period = 0.1,
+                                      omega = 3.3445, 
+                                      axes = ["_x", "_y"])
+        
+        extended_LIP = dy.ExtendedSystem.from_cotrol_system(LIP, 
+                                                    state_vector_name = "x",
+                                                    horizon_lenght = 36)
+        
+        self.assertTrue((extended_LIP.matrices[0] == saved_matrices[0]).all())
+        self.assertTrue((extended_LIP.matrices[1] == saved_matrices[1]).all())
+        
     def test_extended_control_system(self):
         n = len(self.states)
         m = len(self.inputs)
@@ -162,9 +182,47 @@ class DynamicsTestCase(unittest.TestCase):
         self.assertEqual(self.domVar2.domain, original_dom2)
         self.assertEqual(self.domVar3.domain, original_dom3)
         
+def visual_inspection(ext_system):
+    cmap = colors.ListedColormap(['blue','white', 'yellow'])
+    bounds=[0, 0.5,1]
+    norm = colors.BoundaryNorm(bounds, cmap.N)
+    
+    for state, sID in ext_system.state_ID.items():
+        
+        if state[-2:] == "_x":
+            print("\t"*4+"In following, matrices to "+
+                  "obtain the state: '{}'".format(state))
+            state_def = ext_system.definitions[state]
+            
+            for var in state_def.variables:
+                if var[:-2] == ext_system.state_vector_name+"0":
+                    print("The matrix 'S', related to the initial state "+
+                          var+", is: ")
+                    
+                else:
+                    print("The matrix 'U', related to the input "+var+", is: ")
+                    
+                M = state_def.matrices[state_def.variables.index(var)]
+                img = plt.imshow(M.astype(bool), interpolation='nearest', 
+                                 cmap=cmap, norm=norm)
+                plt.colorbar(img, cmap=cmap, norm=norm, boundaries=bounds,
+                             ticks=[0, 1])
+                plt.show()
+        
+def saved_data(file):
+    try:
+        while True:
+            yield pick.load(file)
+    except EOFError:
+        pass 
+        
+        
 if __name__ == "__main__":
     unittest.main()
     
     # FOR MANUAL TEST
     o = DynamicsTestCase()
     o.setUp()
+    
+    # to inspect visually the matrices use the following line:
+#    visual_inspection(o.ext_sys1)
