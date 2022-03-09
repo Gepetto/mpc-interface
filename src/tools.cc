@@ -5,8 +5,16 @@
 /// Date: 2022
 ///
 ///
+
+#ifndef QP_FORMULATIONS_TOOLS_H_
+#define QP_FORMULATIONS_TOOLS_H_
+
+// Standard C++ include
 #include <iostream>
+
+// This repository includes
 #include <qp_formulations/tools.hh>
+#include <qp_formulations/dynamics.hh>
 
 namespace gecko {
 namespace tools {
@@ -15,7 +23,7 @@ using namespace Eigen;
 
 template<typename T>
 using  MatrixType = Eigen::Matrix<T,Eigen::Dynamic, Eigen::Dynamic>;
-   
+
 template<typename Scalar,int rank, typename sizeType>
 auto Tensor_to_Matrix(const Eigen::Tensor<Scalar,rank> &tensor,const sizeType rows,const sizeType cols)
 {
@@ -41,8 +49,7 @@ void display(Tensor<double,3> &aT)
     std::cout <<"[";
     for(Index i1=0;i1<aT.dimension(1);i1++)
     {
-      if (aT.dimension(2)>1)
-        std::cout <<"[";
+      std::cout <<"[";
       for(Index i2=0;i2<aT.dimension(2);i2++)
       {
             std::cout << aT(i0,i1,i2);
@@ -53,7 +60,7 @@ void display(Tensor<double,3> &aT)
       if (i1!=aT.dimension(1)-1) std::cout << std::endl;
     }
     std::cout <<"]";
-    if (i0!=aT.dimension(0)-1) std::cout << std::endl;
+    if (i0!=aT.dimension(0)-1) std::cout << std::endl << std::endl;
   }
   std::cout <<"]"<<std::endl;
 }
@@ -67,7 +74,7 @@ void display(Tensor<double,4> &aT)
             << aT.dimension(3) <<")=[";
   for(Index i0=0;i0<aT.dimension(0);i0++)
   {
-      
+
       std::cout <<"[";
       for(Index i1=0;i1<aT.dimension(1);i1++)
       {
@@ -93,8 +100,8 @@ void display(Tensor<double,4> &aT)
   }
   std::cout <<"]"<<std::endl;
 }
-void extend_matrices(Eigen::MatrixXd &S,
-                     Eigen::Tensor<double, 3> &U,
+void extend_matrices(Eigen::Tensor<double, 3> &S,
+                     Eigen::Tensor<double, 4> &U,
                      unsigned int N,
                      Eigen::MatrixXd &A,
                      Eigen::MatrixXd &B)
@@ -102,10 +109,10 @@ void extend_matrices(Eigen::MatrixXd &S,
   Index n = B.rows();
   Index m = B.cols();
 
+  S.resize(N,n,n);
   MatrixXd s( n * N, n);
   s.setZero();
   Tensor<double, 3> u(n*N,N,m);
-  std::cout << "u.shape=("<< n*N << ","<< N << ","<<m<<")"<<std::endl;
   u.setZero();
 
   s.block(0,0,n,n) = A;
@@ -113,10 +120,9 @@ void extend_matrices(Eigen::MatrixXd &S,
     for(Index ind_m=0;ind_m <m;ind_m++)
       u(ind_n,0,ind_m) = B(ind_n,ind_m);
 
-  display(u);
   for (Index i =1; i <N; i++)
   {
-    
+
     for (Index j=0; j<m;j++)
     {
       Eigen::array<Index,3> offsets={(n*(i-1)), 0,j};
@@ -124,19 +130,63 @@ void extend_matrices(Eigen::MatrixXd &S,
       Eigen::Tensor<double,3> sub_u= u.slice(offsets,extents);
       Eigen::MatrixXd sub_u_m=Tensor_to_Matrix(sub_u,n,i);
 
-      std::cout << "i: " << i
-                << " j: " << j << "(" << n << "," << i << ")"
-                << " sub_u_m:" <<sub_u_m << std::endl;
-
       Eigen::MatrixXd sub_u_adot = A*sub_u_m;
-      std::cout << " A:" << A << std::endl
-                << " sub_a_dot:" << sub_u_adot << std::endl;
+      Eigen::array<Index,3> offsets_concat={n*i, 0,j};
+      Eigen::array<Index,3> extents_concat={n, i,1};
+
+      u.slice(offsets_concat,extents_concat) =
+          Matrix_to_Tensor(sub_u_adot,n,i,1);
     }
-    //    u(n * i;n * (ind_N+1); 
+
+    Eigen::array<Index,3> offsets_B={n*i, i,0};
+    Eigen::array<Index,3> extents_B={n, 1,m};
+
+    u.slice(offsets_B,extents_B) =
+        Matrix_to_Tensor(B,n,1,m);
+
+
+    Eigen::array<Index,3> offsets_disp={n*i, 0,0};
+    Eigen::array<Index,3> extents_disp={n, i,m};
+
+    Eigen::Tensor<double,3> u_disp=u.slice(offsets_disp,extents_disp);
+
+    s.block(n*i,0,n,n) = A*s.block(n*(i-1),0,n,n);
+
   }
-  //  u.block(0,0,n,m) = Matrix_to_Tensor(B,n,1,1,m);
-  std::cout << "u: "<< u << std::endl;
+
+  //  S = np.dstack([s[i : n * N : n, :] for i in range(n)])
+  for (Index i=0;i<N;i++)
+  {
+    Eigen::array<Index,3> offsets_S={i, 0,0};
+    Eigen::array<Index,3> extents_S={1, n,n};
+
+    MatrixXd sb = s.block(n*i,0,n,n);
+    MatrixXd sb_t=sb.transpose();
+    S.slice(offsets_S,extents_S)=Matrix_to_Tensor(sb_t,1,n,n);
+  }
+
+  //    U = [np.dstack([u[i : n * N : n, :, j] for i in range(n)]) for j in range(m)]
+  U.resize(m,N,N,n);
+  for(Index j=0;j<m;j++)
+    for(Index i=0,lU_i=0;i<n*N;i+=n,lU_i++)
+      for(Index k=0;k<N;k++)
+        for(Index l=0;l<n;l++)
+          U(j,lU_i,k,l)=u(i+l,k,j);
+
+}
+
+void update_step_matrices
+(std::shared_ptr<ExtendedSystem> shr_ext_sys,
+ std::map<std::string,double> & kargs)
+{
+
+}
+
+void get_system_matrices(std::string &system)
+{
+
 }
 
 } // end of tools namespace
 } // end of gecko namespace
+#endif
