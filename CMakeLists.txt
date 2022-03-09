@@ -1,0 +1,85 @@
+#
+# Copyright (c) 2015-2022 CNRS 
+#
+
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+
+SET(PROJECT_NAME qp_formulations)
+SET(PROJECT_DESCRIPTION "A fast and flexible formulation of QP Probl")
+SET(PROJECT_URL "http://gitlab.laas.fr/nvilla/qp_formulations")
+SET(PROJECT_CUSTOM_HEADER_EXTENSION "hpp")
+SET(PROJECT_USE_CMAKE_EXPORT TRUE)
+SET(PROJECT_USE_KEYWORD_LINK_LIBRARIES TRUE)
+
+# Disable -Werror on Unix for now.
+SET(CXX_DISABLE_WERROR True)
+SET(CMAKE_VERBOSE_MAKEFILE True)
+
+# Tensor extension imposes CXX 11
+# Tensor_to_Matrix imposes CXX 14
+SET(CMAKE_CXX_STANDARD 14)
+# ----------------------------------------------------
+# --- OPTIONS  ---------------------------------------
+# Need to be set before including base.cmake
+# ----------------------------------------------------
+OPTION(INSTALL_DOCUMENTATION "Generate and install the documentation" OFF)
+
+# Check if the submodule cmake have been initialized
+IF(NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/cmake/base.cmake")
+  MESSAGE(FATAL_ERROR "\nPlease run the following command first:\ngit submodule update --init\n")
+ENDIF()
+
+# Documentation
+SET(DOXYGEN_USE_MATHJAX YES)
+SET(DOXYGEN_USE_TEMPLATE_CSS YES)
+
+
+# Create Project
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/cmake/base.cmake)
+COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX)
+PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
+
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/cmake/boost.cmake)
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/cmake/python.cmake)
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/cmake/ide.cmake)
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/cmake/apple.cmake)
+
+# Specifies dependencies
+
+## Eigen
+ADD_PROJECT_DEPENDENCY(Eigen3 REQUIRED PKG_CONFIG_REQUIRES "eigen3 >= 3.0.5")
+
+## Boost
+SET_BOOST_DEFAULT_OPTIONS()
+EXPORT_BOOST_DEFAULT_OPTIONS()
+ADD_PROJECT_DEPENDENCY(Boost REQUIRED )
+
+# Create target libqp_formulations.so
+
+## Specify sources
+SET(${PROJECT_NAME}_SOURCES
+  ./src/dynamics.cc
+  ./src/tools.cc)
+
+## Create library
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${HEADERS} ${${PROJECT_NAME}_SOURCES})
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC ${CURRENT_COMPILE_DEFINITIONS})
+
+INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIRS})
+
+MESSAGE(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+MESSAGE(STATUS "EIGEN3_INCLUDE_DIR: ${EIGEN3_INCLUDE_DIR}")
+
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
+
+# Install procedure
+INSTALL(TARGETS ${PROJECT_NAME}
+  EXPORT ${TARGETS_EXPORT_NAME}
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
+
+ADD_SUBDIRECTORY(tests_cpp)
