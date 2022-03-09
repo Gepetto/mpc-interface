@@ -41,7 +41,7 @@ Testing the dynamics gives:
 python3 ./tests/test_dynamics.py 
 ...
 ----------------------------------------------------------------------
-Ran 3 tests in 0.298s
+Ran 4 tests in 0.298s
 
 OK
 ```
