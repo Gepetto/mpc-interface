@@ -24,8 +24,8 @@ BOOST_AUTO_TEST_CASE(test_extend_matrices_body)
   B.row(2) << 0.1;
   std::cout << B << std::endl;
 
-  Eigen::MatrixXd S;
-  Eigen::Tensor<double, 3> U;
+  Eigen::Tensor<double, 3> S;
+  Eigen::Tensor<double, 4> U;
   unsigned int N=9;
   
   gecko::tools::extend_matrices(S,U,N,A,B);
@@ -38,8 +38,8 @@ BOOST_AUTO_TEST_CASE(test_extend_matrices_dynamics)
   A.block(7,0,1,8)=MatrixXd::Ones(1,8);
   Eigen::MatrixXd B=MatrixXd::Ones(8,6);
 
-  Eigen::MatrixXd S;
-  Eigen::Tensor<double, 3> U;
+  Eigen::Tensor<double, 3> S;
+  Eigen::Tensor<double, 4> U;
   unsigned int N=20;
   
   gecko::tools::extend_matrices(S,U,N,A,B);
