@@ -12,5 +12,5 @@ setup(
     description="Gecko.",
     author="Nahuel Villa",
     author_email="nvilla@laas.fr",
-    packages=["formulation", "gecko"],
+    packages=["python/formulation", "python/gecko"],
 )
