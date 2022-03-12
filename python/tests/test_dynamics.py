@@ -72,13 +72,16 @@ class DynamicsTestCase(unittest.TestCase):
             singVar.domain.update({var:sizes[ID] 
                                    for var, ID in singVar.domain_ID.items()})
             
-        domVar1 = dy.DomainVariable("n", 20, ["_x", "_y"], time_variant=True,
+        domVar1 = dy.DomainVariable("non_lin", 20, ["_x", "_y"], time_variant=True,
                                     how_to_update_size=in_this_way)
         domVar2 = dy.DomainVariable("n", 20, ["_x", "_y"], time_variant=False,
                                     how_to_update_size=in_this_way)
-        domVar3 = dy.DomainVariable(["n", "H"], [20, 20], ["_x", "_y"])
+        domVar3 = dy.DomainVariable(["n", "H"], [20, 120], ["_x", "_y"])
+        domVar4 = dy.DomainVariable("o", [20])
+        domVar5 = dy.DomainVariable("o", [20], 5)
         
         self.domVar1 = domVar1; self.domVar2 = domVar2; self.domVar3 = domVar3
+        self.domVar4 = domVar4; self.domVar5 = domVar5
         
     def test_control_system(self):
         self.assertEqual(self.cnt_sys1.state_names, self.states)
@@ -98,11 +101,12 @@ class DynamicsTestCase(unittest.TestCase):
         self.assertTrue((self.cnt_sys2.B==self.B).all())
         self.assertTrue((self.cnt_sys3.B==self.B).all())
         
-        LIP = dy.ControlSystem.from_name("J->CCC", 0.1, 3.5, ["_x", "_y"])
-        self.assertEqual(LIP.T, 0.1)
-        self.assertEqual(LIP.w, 3.5)
-        correctA = use.get_system_matrices("J->CCC")[0](0.1, 3.5)
-        correctB = use.get_system_matrices("J->CCC")[1](0.1, 3.5)
+        LIP = dy.ControlSystem.from_name("J->CCC", ["_x", "_y"],
+                                         tau=0.1, omega=3.5)
+        self.assertEqual(LIP.parameters["tau"], 0.1)
+        self.assertEqual(LIP.parameters["omega"], 3.5)
+        correctA = use.get_system_matrices("J->CCC")[0](tau=0.1, omega=3.5)
+        correctB = use.get_system_matrices("J->CCC")[1](tau=0.1, omega=3.5)
         
         self.assertTrue((LIP.A==correctA).all())
         self.assertTrue((LIP.B==correctB).all())
@@ -113,7 +117,7 @@ class DynamicsTestCase(unittest.TestCase):
         file.close()
         
         LIP = dy.ControlSystem.from_name(system_name = 'J->CCC',
-                                      discretization_period = 0.1,
+                                      tau = 0.1,
                                       omega = 3.3445, 
                                       axes = ["_x", "_y"])
         
@@ -158,6 +162,13 @@ class DynamicsTestCase(unittest.TestCase):
         for state, ID in self.ext_sys2.state_ID.items():
             self.assertEqual(int(state[1]), ID)
             
+        self.ext_sys1.define_output("new_var", {"u5":2, "x0":1})
+        self.assertEqual(len(self.ext_sys1.outputs), len(self.ext_sys1.axes))
+        self.assertTrue("new_var"+self.ext_sys1.axes[0] in
+                        self.ext_sys1.definitions)
+        
+        self.ext_sys1.update(control_system=self.cnt_sys1, factor=4)
+            
     def test_domain_variable(self):
         n1 = 1; n2 = 1; n3 = 2
         self.assertEqual(len(self.domVar1.domain), n1*len(self.domVar1.axes))
@@ -181,6 +192,12 @@ class DynamicsTestCase(unittest.TestCase):
         self.assertNotEqual(self.domVar1.domain, original_dom1)
         self.assertEqual(self.domVar2.domain, original_dom2)
         self.assertEqual(self.domVar3.domain, original_dom3)
+        
+        # defining outputs:
+        
+        self.domVar1.define_output("n0", {"non_lin":np.array([1]+[0]*19)})
+        self.assertTrue((self.domVar1.definitions["n0_y"].matrices ==
+                         np.array([1]+[0]*19)).all())
         
 def visual_inspection(ext_system):
     cmap = colors.ListedColormap(['blue','white', 'yellow'])

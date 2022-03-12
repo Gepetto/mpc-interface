@@ -151,34 +151,34 @@ def get_system_matrices(system):
     if system == "P->CC":
         A = sy.Matrix([[0, 1], [w_ ** 2, 0]])
         B = sy.Matrix([0, -(w_ ** 2)])
-        parameters = ("tau", "omega", "*args")
+        parameters = ("tau=None", "omega=None", "**kwargs")
 
     elif system == "P->X":
         A = sy.Matrix([w_])
         B = sy.Matrix([-w_])
-        parameters = ("tau", "omega", "*args")
+        parameters = ("tau=None", "omega=None", "**kwargs")
 
     elif system == "dP->CCC":
         A = sy.Matrix([[0, 1, 0], [0, 0, 1], [0, w_ ** 2, 0]])
         B = sy.Matrix([0, 0, -(w_ ** 2)])
-        parameters = ("tau", "omega", "*args")
+        parameters = ("tau=None", "omega=None", "**kwargs")
 
     elif system == "dP->CCP":
         A = sy.Matrix([[0, 1, 0], [w_ ** 2, 0, -(w_ ** 2)], [0, 0, 0]])
         B = sy.Matrix([0, 0, 1])
-        parameters = ("tau", "omega", "*args")
+        parameters = ("tau=None", "omega=None", "**kwargs")
 
     elif system == "J->CCC":
         A = sy.Matrix([[0, 1, 0], [0, 0, 1], [0, 0, 0]])
         B = sy.Matrix([0, 0, 1])
-        parameters = ("tau", "*args")
+        parameters = ("tau=None", "**kwargs")
 
     A_, B_ = sy.simplify(discretize(A, B))
 
     get_matrix_A = sy.lambdify(parameters, A_, "numpy")
     get_matrix_B = sy.lambdify(parameters, B_, "numpy")
 
-    return get_matrix_A, get_matrix_B
+    return get_matrix_A, get_matrix_B, parameters
 
 def get_system_variables(system):
     """
