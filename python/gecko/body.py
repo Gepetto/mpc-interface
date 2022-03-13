@@ -6,6 +6,7 @@ Created on Tue Feb  1 20:07:59 2022
 @author: nvilla
 """
 import numpy as np
+import gecko.tools as use
 #from scipy import sparse
 
 class Formulation:
@@ -29,6 +30,8 @@ class Formulation:
         self.constraint_boxes = {}
         self.constraints = {}  # constraint names related to list of restrictions.
         self.goals = {} # named costs functions
+        
+        self.update_incorporations = use.do_not_update
 
     # INCORPORATIONS
     def incorporate_dynamics(self, name, new_dynamics):
@@ -118,23 +121,13 @@ class Formulation:
 
         self.optim_ID.update(dict(zip(self.optim_variables, optim_ranges)))
         self.given_ID.update(dict(zip(self.given_variables, given_ranges)))
+    
+    def set_updating_rule(self, how_to_update=None):
+        
+        self.update_incorporations = how_to_update
         
     def update(self, **kargs):
-#        for dynamics in self.dynamics.values():
-#            if dynamics.time_variant:
-#                dynamics.update(**kargs)
-#            
-#        for definition in self.definitions.values():
-#            if definition.time_variant:
-#                definition.update()
-#                
-#        for box in self.constraint_boxes.values():
-#            if box.time_variant:
-#                box.update(**kargs)
-        
-        ## TODO: incorporate here a function "How to update" For now, I just 
-#                   update the dynamics, definitions and constraints outside
-        
+        self.update_incorporations(self, **kargs)
         self.update_qp_domain()
         self.update_qp_sizes()
         self.update_qp_IDs()
@@ -203,7 +196,7 @@ class Formulation:
     
     def preview(self, variable, given, optim): pass
         ## TODO: implement this funtion. just take the matrices from PM and
-         ## return the previewed matrix.
+         ## return the previewed trajectory.
     
     def generate_qp_constraint(self, limit, given):## requires updated limit
         
@@ -276,7 +269,27 @@ class Formulation:
         q = np.add.reduce([q[1] for q in matrices])
 
         return Q, q
+    
+    ## TODO: we are missing equality constraints.
         
+    def generate_all_qp_matrices(self, given_collector):
+        """ 
+        Argument:
+            given_collector: dictionary containing the values of all given
+                             variables as {"variable": column np.array}
+                             
+            The given variables are reported 
+            by asking for `self.given_variables`
+            
+        """
+        
+        given = self.arrange_given(given_collector)
+        
+        A, h = self.generate_all_qp_constraints(given)
+        Q, q = self.generate_all_qp_costs(given)
+        
+        return A, h, Q, q
+    
         
         
         
