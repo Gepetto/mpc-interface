@@ -194,10 +194,18 @@ class Formulation:
             given = np.array([])
         return given
     
-    def preview(self, variable, given, optim): pass
-        ## TODO: implement this funtion. just take the matrices from PM and
-         ## return the previewed trajectory.
-    
+    def preview(self, given, optim, variable, axes=None): 
+        if axes is None:
+            Mg, Mo = self.PM[variable] 
+            return Mg @ given + Mo @ optim
+        
+        preview = []
+        for axis in axes:
+            Mg, Mo = self.PM[variable+axis]
+            preview.append(Mg @ given + Mo @ optim)
+         
+        return np.hstack(preview)
+        
     def generate_qp_constraint(self, limit, given):## requires updated limit
         
         rows = self.PM[limit.variable+limit.axes[0]][0].shape[0]

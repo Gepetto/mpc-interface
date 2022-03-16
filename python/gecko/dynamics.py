@@ -288,6 +288,8 @@ class ExtendedSystem:
                             comb, time_variant=time_variant,
                             how_to_update=how_to_update)
                     })
+            if time_variant:
+                self.definitions[name+axis].update(extSyst = self)
             self.outputs.append(name+axis)
         
     def update_definitions(self):
@@ -301,7 +303,7 @@ class ExtendedSystem:
                 self.definitions[state].matrices[vID] = self.matrices[dID][..., sID]
                 
         for output in self.outputs:
-            self.definitions[output].update(extSyst = self)
+            self.definitions[output].update(extSyst=self)
               
     def update_matrices(self, **kargs): 
         self.__figuring_out(self, **kargs)

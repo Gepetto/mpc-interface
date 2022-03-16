@@ -129,9 +129,17 @@ def make_simetric_vertices(xy_corner):
     
     return np.hstack([x_values, y_values])
 
-def adapt_size(lc, steps):
-    var = "Ds"+lc.variables[0][-2:]
-    lc.matrices[lc.variables.index(var)] = steps.definitions[var].matrices[0][0]
+def adapt_size(stamps, **kargs):
+    dynamics = kargs["extSyst"]
+    axis = stamps.variables[0][2:]
+    
+    Ds_name = "Ds" + axis; x0_name = "s0" + axis
+    Ds_coeff_ID = stamps.variables.index(Ds_name)
+    s0_coeff_ID = stamps.variables.index(x0_name)
+    size = dynamics.domain[Ds_name]
+    
+    stamps.matrices[Ds_coeff_ID] = np.tril(np.ones([size+1, size]), -1)
+    stamps.matrices[s0_coeff_ID] = np.ones([size+1, 1])
               
 def get_system_matrices(system):
     """
