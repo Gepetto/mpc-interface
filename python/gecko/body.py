@@ -280,7 +280,7 @@ class Formulation:
     
     ## TODO: we are missing equality constraints.
         
-    def generate_all_qp_matrices(self, given_collector):
+    def generate_all_qp_matrices(self, given):
         """ 
         Argument:
             given_collector: dictionary containing the values of all given
@@ -291,7 +291,6 @@ class Formulation:
             
         """
         
-        given = self.arrange_given(given_collector)
         
         A, h = self.generate_all_qp_constraints(given)
         Q, q = self.generate_all_qp_costs(given)

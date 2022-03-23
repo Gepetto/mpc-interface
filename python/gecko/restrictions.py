@@ -210,7 +210,7 @@ class Constraint:
         one separately, or introduce a np.vstack of row points to check 
         feasibility along the time horizon. Or a list of np.stacks if 
         prefered.
-        for evaluations along hte horizon, points are considered to ve at the 
+        for evaluations along the horizon, points are considered to ve at the 
         scheduled times.
         """
         if isinstance(points, list):
@@ -240,22 +240,6 @@ class Constraint:
         text+= "\n\t\t\t\t\textreme: "+ (" "*9).join(str(extreme) for extreme in self.extreme)
         text+= "\n"
         return text
-    
-#    def __repr__(self):
-#        if self.axes != [""]:
-#            axes = "_"+"".join(axis[1:] for axis in self.axes)
-#        else:
-#            axes = ""
-#        bounds = self.bound()
-#        if bounds.shape[0] == 1:
-#            timing = "limits of the form:\n"
-#            text = timing + "\n".join("\t"+"arrow @ " + self.variable+axes +
-#                                      " < "+str(bound[0]) for bound in bounds)   
-#        else:
-#            text = "\n".join("limit {}:\t\t".format(i)+"arrow @ " + 
-#                             self.variable + axes + " < "+str(bound[0]) 
-#                             for i, bound in enumerate(bounds))
-#        return text
                 
 ## TODO: The axes should also be an atribute of the box
 class Box:

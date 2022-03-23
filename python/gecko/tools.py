@@ -44,7 +44,10 @@ def update_step_matrices(extSyst, **kargs):
         
     """
     N = extSyst.matrices[-1].shape[0]
-    count = kargs["count"]
+    if "count" in kargs.keys(): 
+        count = kargs["count"]
+    else:
+        count = 0
     
     if "step_times" in kargs.keys():
         step_times = kargs["step_times"]
@@ -54,26 +57,27 @@ def update_step_matrices(extSyst, **kargs):
         regular_time = kargs["regular_time"]
         step_times = None
         
+        
     else:
         raise KeyError("This funtion needs either 'step_times' or "+
                        "'regular_time', but the kargs "+
                        "introduced are {}".format(kargs.keys()))
         
-    U = plan_steps(count, N, step_times, regular_time)
+    U = plan_steps(N, count, step_times, regular_time)
     extSyst.matrices[0] = U[:, :, None]
     
     ### TODO: add if count is None --> count=0 to take step_times that are refered to the present.
-def plan_steps(count, N, step_times=None, regular_time=None):
+def plan_steps(N, count=0, step_times=None, regular_time=None):
     
     preview_times = count + np.arange(N)
     
     if step_times is not None:
         next_steps = step_times[(step_times >= count) * 
                                 (step_times < count+N-1)]
-        
+
     elif regular_time is not None:
         next_steps = np.array([time for time in preview_times
-                               if not (time+2)%regular_time     # +1 was in the parenthesis
+                               if not (time+2)%regular_time
                                and time < count+N-1])
     else:
         msg = "either the step_times or some "+\
