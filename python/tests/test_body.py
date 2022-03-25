@@ -26,7 +26,7 @@ class BodyTestCase(unittest.TestCase):
         LIP_ext = ExtendedSystem.from_cotrol_system(LIP, "x", 9)
         LIP_ext.define_output("DCM", {"CoM":1, "CoM_dot":1/3.5})
         
-        E = use.plan_steps(1, 9, step_times=np.array([2, 5, 8]))[:, :, None]
+        E = use.plan_steps(9, 1, step_times=np.array([2, 5, 8]))[:, :, None]
         F = np.ones([9, 1, 1])
         
         steps = ExtendedSystem(["Ds"], ["s"], "s", F, [E], ["_x", "_y"],

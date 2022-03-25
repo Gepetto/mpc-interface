@@ -209,7 +209,8 @@ class Formulation:
     def generate_qp_constraint(self, limit, given):## requires updated limit
         
         rows = self.PM[limit.variable+limit.axes[0]][0].shape[0]
-        c_rows = rows if limit.nlines is None else limit.nlines
+        nlines = limit.nlines
+        c_rows = rows if nlines is None else nlines
         
         cMg = np.zeros([c_rows, self.given_len])
         cMo = np.zeros([c_rows, self.optim_len])
@@ -217,9 +218,10 @@ class Formulation:
         schedule = range(rows) if not limit.schedule else limit.schedule
         bound = limit.bound() 
         
+        limit_matrices = limit.matrices()
         for i, axis in enumerate(limit.axes):
             Mg, Mo = self.PM[limit.variable+axis]
-            c = limit.matrices[i]
+            c = limit_matrices[i]
             
             if limit.L:
                 cMg += c @ Mg[schedule]; cMo += c @ Mo[schedule]

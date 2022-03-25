@@ -111,7 +111,7 @@ def reduce_by_time(box, **kargs):
     landing_advance = kargs["landing_advance"]
     
     new_center = current_swing_pose.get_translation()[:2]
-    box.move_TS_box(new_center)
+    box.recenter_in_TS(new_center)
     
     s = (step_duration-landing_advance-current_ss_time)/(step_duration-landing_advance)
     scale = s if s > 0 else 1e-2 

@@ -36,7 +36,7 @@ class RestrictionsTestCase(unittest.TestCase):
         
     def test_constructor(self):
         
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             Constraint(variable="CoM",  extreme=10, axes=["_x", "_y"])
         with self.assertRaises(ValueError):
             Constraint(variable="CoM", extreme=10, axes=["_x", "_y"], arrow=5)
@@ -52,13 +52,13 @@ class RestrictionsTestCase(unittest.TestCase):
         self.assertTrue(isinstance(self.limit4.L, list))
         self.assertTrue(len(self.limit5.L) == len(self.limit5.axes))
         
-        self.assertTrue(isinstance(self.limit1.matrices, list))
+        self.assertTrue(isinstance(self.limit1.matrices(), list))
         
-        self.assertTrue(len(self.limit1.matrices) == 1)
-        self.assertTrue(len(self.limit2.matrices) == 1)
-        self.assertTrue(len(self.limit3.matrices) == 2)
-        self.assertTrue(len(self.limit4.matrices) == 2)
-        self.assertTrue((self.limit5.matrices[0] == 
+        self.assertTrue(len(self.limit1.matrices()) == 1)
+        self.assertTrue(len(self.limit2.matrices()) == 1)
+        self.assertTrue(len(self.limit3.matrices()) == 2)
+        self.assertTrue(len(self.limit4.matrices()) == 2)
+        self.assertTrue((self.limit5.matrices()[0] == 
                         self.limit5.L[0]*self.limit5.arrow[0, 0]).all())
         
         self.assertTrue(self.limit1.nlines is None)
@@ -66,8 +66,7 @@ class RestrictionsTestCase(unittest.TestCase):
         self.assertTrue(self.limit3.nlines is None)
         self.assertTrue(self.limit4.nlines == self.limit4.L[0].shape[0])
         self.assertTrue(self.limit5.nlines == self.limit5.L[0].shape[0])
-        self.assertTrue(self.limit6.nlines == self.limit6.schedule.stop - 
-                                              self.limit6.schedule.start)
+        self.assertTrue(self.limit6.nlines == self.limit6.t)
         
     def test_bound(self):
         
@@ -81,18 +80,19 @@ class RestrictionsTestCase(unittest.TestCase):
         self.limit1.update(extreme = [3.9, 2]) # as a result arrow with 2 rows
         self.assertEqual(self.limit1.arrow.shape[0], 2)
         
-        self.limit1.update(arrow = 5) # now arrow and extr with 1 row
-        self.assertEqual(self.limit1.extreme.shape[0], 1)
+        self.limit1.update(arrow = 5) # still arrow and extr with 2 row
+        self.assertEqual(self.limit1.extreme.shape[0], 2)
         
-        self.limit1.update(extreme = [4, 7, 8]) # Now arrow has 3 rows
+        
+        self.limit1.update(extreme = [4, 7, 8], arrow = [5, 5, 5]) # Now arrow has 3 rows
         self.limit1.update(L=np.zeros([3, 3])) 
         
         self.assertEqual(self.limit1.nlines, 3)
-        self.assertEqual(self.limit1.matrices[0].size, self.limit1.L[0].size)
+        self.assertEqual(self.limit1.matrices()[0].size, self.limit1.L[0].size)
         
         with self.assertRaises(IndexError):
             self.limit1.update(L=[np.zeros([3, 3]), np.eye(3)])
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             self.limit1.update(L = np.zeros([3, 3]), schedule = range(2))
         
         self.limit1.update(schedule=range(15), L=np.zeros([3, 15]))
@@ -112,6 +112,33 @@ class RestrictionsTestCase(unittest.TestCase):
         self.limit4.update(arrow = np.ones([5, 2]))
         self.assertEqual(self.limit4.extreme.shape[0], 5)
         self.limit4.update(L = np.ones([5, 10]))
+        
+    def test_SS_to_TS(self):
+        
+        L = np.array([[1, 3, 4], 
+                      [0, 8, 1]])
+        arrow = [0, 1]
+        extreme = 3
+        axes = ["_x", "_y"]
+        
+        limit = Constraint(variable = "p",
+                               extreme = extreme,
+                               axes = axes,
+                               arrow = arrow,
+                               L=L)
+        other_limit = Constraint(variable = "p",
+                               extreme = extreme,
+                               axes = axes,
+                               arrow = arrow)
+        
+        ss_points = [np.ones([3, 2]), np.zeros([3, 2]),
+                     np.array([[3, 1, 8]]*2).T, np.array([[0, 2, 1]]*2).T]
+        
+        ts_points = [limit.SS_to_TS(point) for point in ss_points]
+        self.assertTrue(all([point.shape == (2, 2) for point in ts_points]))
+        
+        ots_points = [other_limit.SS_to_TS(point) for point in ts_points]
+        self.assertEqual(ots_points, ts_points)
         
     def test_is_feasible(self):
         
@@ -146,8 +173,20 @@ class RestrictionsTestCase(unittest.TestCase):
             self.assertTrue(limit.arrow in [1, -1])
             self.assertTrue(limit.extreme > 0)
             self.assertTrue((limit.center == np.array([0, 0])).all())
+            
+        TSbox = Box.task_space("CoM", vertices, ["_x", "_y"])
+        internal_points = np.split(vertices*0.99, 4)
+        external_points = np.split(vertices*1.001, 4)
         
-        SSbox.move_SS_box([1, 2])
+        self.assertTrue(all(TSbox.is_feasible(internal_points, "TS")))
+        self.assertTrue(not all(TSbox.is_feasible(external_points, "TS")))
+        
+    def test_transformations(self):
+        
+        vertices = np.array([[0, 1], [1, 0], [0, -1], [-1, 0]])
+        SSbox = Box.state_space("CoM", vertices, ["_x"])
+        
+        SSbox.recenter_in_SS([[1], [2]])
         
         true_points = [np.reshape([1e-5, 2], [-1, 1]), 
                        np.reshape([1, 1+1e-5], [-1, 1]),
@@ -161,16 +200,42 @@ class RestrictionsTestCase(unittest.TestCase):
                         np.reshape([2+1e-5, 2], [-1, 1]),
                         np.reshape([0, 0], [-1, 1])]
         
-        self.assertTrue(all(SSbox.is_feasible(true_points)))
-        self.assertTrue(not all(SSbox.is_feasible(false_points)))
-        
+        self.assertTrue(all(SSbox.is_feasible(true_points, "SS")))
+        self.assertTrue(not all(SSbox.is_feasible(false_points, "SS")))
         for limit in SSbox.constraints:
             self.assertTrue((np.round(np.abs(limit.center), 4) == [2.1213, 0.7071]).any())
+        
+        translation = [[20], [20]]
+        SSbox.translate_in_SS(translation)
+        
+        translated_true_points = [np.reshape([1e-5, 2], [-1, 1]) + translation, 
+                                  np.reshape([1, 1+1e-5], [-1, 1]) + translation,
+                                  np.reshape([1, 3-1e-5], [-1, 1]) + translation,
+                                  np.reshape([2-1e-5, 2], [-1, 1]) + translation,
+                                  np.reshape([1, 2], [-1, 1]) + translation]
+                    
+        self.assertTrue(all(SSbox.is_feasible(translated_true_points, "SS")))
         
         SSbox.scale_box(np.sqrt(2))
         for limit in SSbox.constraints:
             self.assertTrue(limit.extreme == 1.)
+            
+        TSbox = Box.task_space("CoM", vertices, ["_x", "_y"])
+        internal_points = np.split(vertices*0.99, 4)
+        external_points = np.split(vertices*1.001, 4)
         
+        rotation = np.array([[0, -1], [1, 0]])
+        TSbox.rotate_in_TS(rotation)
+        
+        self.assertTrue(all(TSbox.is_feasible(internal_points, "TS")))
+        self.assertTrue(not all(TSbox.is_feasible(external_points, "TS")))
+        
+        smaller_rotation = np.array([[np.cos(0.1), -np.sin(0.1)],
+                                      [np.sin(0.1), np.cos(0.1)]])
+        TSbox.rotate_in_TS(smaller_rotation)
+        
+        self.assertTrue(not all(TSbox.is_feasible(internal_points, "TS")))
+        self.assertTrue(not all(TSbox.is_feasible(external_points, "TS")))
         
 if __name__ == "__main__":
     
