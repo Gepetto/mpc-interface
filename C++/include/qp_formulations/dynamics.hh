@@ -10,6 +10,7 @@
 #define GECKO_DYNAMICS_H_
 
 #include <functional>
+#include <memory>
 
 #include <Eigen/Eigen>
 
@@ -35,7 +36,7 @@ class ExtendedSystem;
 class ControlSystem
 {
  public:
-  
+
   ControlSystem(std::vector<std::string> & input_names,
                 std::vector<std::string> & state_names,
                 Eigen::MatrixXd & A,
@@ -48,7 +49,7 @@ class ControlSystem
 
   void update_matrices(std::shared_ptr<ExtendedSystem> shr_ext_sys,
                        std::map<std::string,int> &kargs);
-  
+
  protected:
   /// Store the names of the inputs
   std::vector<std::string> input_names_;
@@ -71,7 +72,7 @@ class ControlSystem
   std::function<void
   (std::shared_ptr<ExtendedSystem> shr_ext_sys,
    std::map<std::string,int> &kargs)> how_to_update_matrices_;
-  
+
 };
 /// *{
 /// \class ExtendenSystem
@@ -102,7 +103,7 @@ class ExtendedSystem
                   Eigen::MatrixXd &,
                   Eigen::MatrixXd &)> how_to_update_ext_matrices,
                  bool time_variant=true);
-  
+
   void identify_domain(std::vector<std::string> &input_name,
                        std::vector<std::string> &state_names);
  protected:
@@ -122,7 +123,7 @@ class ExtendedSystem
   /// Matrices
   /// State related matrix
   Eigen::Tensor<double, 3> S_;
-  
+
   /// Command related matrixo
   Eigen::Tensor<double, 4> U_;
 
@@ -161,10 +162,10 @@ class ExtendedSystem
 
   /// TODO:
   void update_sizes();
-  
-  
+
+
 };
-  
+
 }
 }
 #endif
