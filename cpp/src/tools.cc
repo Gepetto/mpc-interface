@@ -176,13 +176,13 @@ void extend_matrices(Eigen::Tensor<double, 3> &S,
 }
 
 void update_step_matrices
-(std::shared_ptr<ExtendedSystem> shr_ext_sys,
- std::map<std::string,double> & kargs)
+(std::shared_ptr<ExtendedSystem> /*shr_ext_sys*/,
+ std::map<std::string,double> & /*kargs*/)
 {
 
 }
 
-void get_system_matrices(std::string &system)
+void get_system_matrices(std::string & /*system*/)
 {
 
 }

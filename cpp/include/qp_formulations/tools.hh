@@ -28,7 +28,7 @@ void extend_matrices(Eigen::Tensor<double, 3> &S,
                      Eigen::MatrixXd &A,
                      Eigen::MatrixXd &B);
 
-};
+}
 
 
 }
