@@ -6,6 +6,7 @@ Created on Wed Feb  2 10:35:54 2022
 @author: nvilla
 """
 
+from pathlib import Path
 
 import unittest
 import matplotlib.pyplot as plt
@@ -16,7 +17,7 @@ from collections.abc import Iterable
 
 import gecko.dynamics as dy
 import gecko.tools as use
-import pickle as pick
+import pickle
 
 class DynamicsTestCase(unittest.TestCase):
     def setUp(self):
@@ -112,9 +113,8 @@ class DynamicsTestCase(unittest.TestCase):
         self.assertTrue((LIP.B==correctB).all())
         
     def test_extended_matrices(self):
-        file = open("LIP_matrices", "rb")
-        saved_matrices = list(next(saved_data(file)).values())[0]
-        file.close()
+        with (Path(__file__).parent / "LIP_matrices").open("rb") as f:
+            saved_matrices = pickle.load(f)["matrices"]
         
         LIP = dy.ControlSystem.from_name(system_name = 'J->CCC',
                                       tau = 0.1,
@@ -125,8 +125,8 @@ class DynamicsTestCase(unittest.TestCase):
                                                     state_vector_name = "x",
                                                     horizon_lenght = 36)
         
-        self.assertTrue((extended_LIP.matrices[0] == saved_matrices[0]).all())
-        self.assertTrue((extended_LIP.matrices[1] == saved_matrices[1]).all())
+        self.assertTrue(np.isclose(extended_LIP.matrices[0], saved_matrices[0]).all())
+        self.assertTrue(np.isclose(extended_LIP.matrices[1], saved_matrices[1]).all())
         
     def test_extended_control_system(self):
         n = len(self.states)
@@ -225,13 +225,6 @@ def visual_inspection(ext_system):
                 plt.colorbar(img, cmap=cmap, norm=norm, boundaries=bounds,
                              ticks=[0, 1])
                 plt.show()
-        
-def saved_data(file):
-    try:
-        while True:
-            yield pick.load(file)
-    except EOFError:
-        pass 
         
         
 if __name__ == "__main__":
