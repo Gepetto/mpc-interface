@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2022 CNRS 
+# Copyright (c) 2015-2022 CNRS
 #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
@@ -15,9 +15,6 @@ SET(PROJECT_USE_KEYWORD_LINK_LIBRARIES TRUE)
 SET(CXX_DISABLE_WERROR True)
 SET(CMAKE_VERBOSE_MAKEFILE True)
 
-# Tensor extension imposes CXX 11
-# Tensor_to_Matrix imposes CXX 14
-SET(CMAKE_CXX_STANDARD 14)
 # ----------------------------------------------------
 # --- OPTIONS  ---------------------------------------
 # Need to be set before including base.cmake
@@ -43,6 +40,10 @@ INCLUDE(${CMAKE_CURRENT_LIST_DIR}/cmake/boost.cmake)
 INCLUDE(${CMAKE_CURRENT_LIST_DIR}/cmake/python.cmake)
 INCLUDE(${CMAKE_CURRENT_LIST_DIR}/cmake/ide.cmake)
 INCLUDE(${CMAKE_CURRENT_LIST_DIR}/cmake/apple.cmake)
+
+# Tensor extension imposes CXX 11
+# Tensor_to_Matrix imposes CXX 14
+CHECK_MINIMAL_CXX_STANDARD(14 ENFORCE)
 
 # Specifies dependencies
 
