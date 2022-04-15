@@ -93,18 +93,18 @@ def formulate_biped(conf):
     terminal_constraint.set_safety_margin(cop_safety_margin)
     
     ##COSTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    relax_ankles_x = Cost("(b+n-s)", [0], 
-                        conf.cost_weights["relax ankles"], axes = ["_x"])
-    relax_ankles_y = Cost("(b+n-s)", [0], 
-                        conf.cost_weights["relax ankles"], axes = ["_y"])
-    minimum_jerk = Cost("CoM_dddot", [0, 0],
-                        conf.cost_weights["minimize jerk"], axes = axes)
-    track_vel_x = Cost("CoM_dot", conf.target_vel[0],
-                        conf.cost_weights["track velocity"], axes = ["_x"])
-    track_vel_y = Cost("CoM_dot", conf.target_vel[1],
-                       conf.cost_weights["track velocity"], axes = ["_y"])
-    terminal_cost = Cost("(DCM-s)", [0,0], 
-                         conf.cost_weights["terminal"], axes = axes, 
+    relax_ankles_x = Cost("(b+n-s)", conf.cost_weights["relax ankles"], 
+                          aim = [0], axes = ["_x"])
+    relax_ankles_y = Cost("(b+n-s)", conf.cost_weights["relax ankles"],
+                          aim = [0], axes = ["_y"])
+    minimum_jerk = Cost("CoM_dddot", conf.cost_weights["minimize jerk"], 
+                        aim = [0, 0], axes = axes)
+    track_vel_x = Cost("CoM_dot", conf.cost_weights["track velocity"], 
+                       aim = conf.target_vel[0], axes = ["_x"])
+    track_vel_y = Cost("CoM_dot", conf.cost_weights["track velocity"],
+                       aim = conf.target_vel[1], axes = ["_y"])
+    terminal_cost = Cost("(DCM-s)", conf.cost_weights["terminal"], 
+                         aim = [0,0], axes = axes, 
                          schedule=range(horizon_lenght-1, horizon_lenght))
     
     ##Formulation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
