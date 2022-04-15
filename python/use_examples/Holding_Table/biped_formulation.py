@@ -15,7 +15,7 @@ from gecko.restrictions import Box
 from gecko.goal import Cost
 from gecko.combinations import LineCombo
 
-import biped_configuration as config ## TODO: isolate the configuration corresponding to this script and the MPC
+import biped_configuration as config
 
 def formulate_biped(conf):
     
@@ -44,6 +44,8 @@ def formulate_biped(conf):
     
                             ##~Non-Linearity~##
     bias = DomainVariable("n", horizon_lenght, axes)
+    
+    yawls = DomainVariable("yawl", horizon_lenght)
     
     ##EXTRA DEFINITIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     n_coeff = np.diag(np.ones([horizon_lenght-1]), 1)
@@ -106,7 +108,6 @@ def formulate_biped(conf):
     terminal_cost = Cost("(DCM-s)", [0,0], 
                          conf.cost_weights["terminal"], axes = axes, 
                          schedule=range(horizon_lenght-1, horizon_lenght))
-    
     
     ##Formulation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     form = Formulation()

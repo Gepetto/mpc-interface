@@ -205,7 +205,22 @@ class Formulation:
             preview.append(Mg @ given + Mo @ optim)
          
         return np.hstack(preview)
-        
+    
+    def goal_distance(self, given, optim, goal_name):
+        value = 0
+        goal = self.goals[goal_name]
+        for i, axis in enumerate(goal.axes):
+            Mg, Mo = self.PM[goal.variable+axis]
+            v = Mg @ given + Mo @ optim - goal.aim[:, i]
+            value += v.T @ v
+        return float(value)
+    
+    def full_goal_distance(self, given, optim):
+        value = 0
+        for goal_name in self.goals.keys():
+            value += self.goal_distance(given, optim, goal_name)
+        return value
+                 
     def generate_qp_constraint(self, limit, given):## requires updated limit
         
         rows = self.PM[limit.variable+limit.axes[0]][0].shape[0]
@@ -234,7 +249,7 @@ class Formulation:
         
         return A, h
     
-    def generate_qp_cost(self, cost, given):## requires updated limit
+    def generate_qp_cost(self, cost, given):
         
         Q = np.zeros([self.optim_len, self.optim_len])
         q = np.zeros([self.optim_len, 1])
@@ -243,19 +258,27 @@ class Formulation:
         schedule = range(rows) if not cost.schedule else cost.schedule
         
         for i, axis in enumerate(cost.axes):
-            Mg, Mo = self.PM[cost.variable+axis]
-            c = cost.matrices[i]
+            var = cost.variable+axis
+            cro = cost.cross+axis
             
             if cost.L:
-                cMg = c @ Mg[schedule]; cMo = c @ Mo[schedule]
+                vMg = cost.L[i] @ self.PM[var][0][schedule]
+                vMo = cost.L[i] @ self.PM[var][1][schedule]
             else:
-                cMg = c * Mg[schedule]; cMo = c * Mo[schedule]
+                vMg = self.PM[var][0][schedule];vMo = self.PM[var][1][schedule]
+                
+            if cost.cross_L:
+                cMg = cost.cross_L[i] @ self.PM[cro][0][schedule]
+                cMo = cost.cross_L[i] @ self.PM[cro][1][schedule]
+            else:
+                cMg = self.PM[cro][0][schedule];cMo = self.PM[cro][1][schedule]
             
-            Q += cost.weight * cMo.T @ cMo
-            q += cost.weight * cMo.T @ (cMg @ given - cost.aim[:, i])
+            Q += cost.weight * vMo.T @ cMo
+            q += cost.weight * (vMo.T @ (cMg @ given - cost.cross_aim[:, i]) +
+                                cMo.T @ (vMg @ given - cost.aim[:, i]))/2
         
         return Q, q
-    
+        
     def generate_all_qp_constraints(self, given):
         
         matrices = [self.generate_qp_constraint(limit, given)
@@ -285,14 +308,14 @@ class Formulation:
     def generate_all_qp_matrices(self, given):
         """ 
         Argument:
-            given_collector: dictionary containing the values of all given
-                             variables as {"variable": column np.array}
-                             
-            The given variables are reported 
-            by asking for `self.given_variables`
-            
-        """
+            given: ndarray with shape (given_len, 1) containing the values
+                    of all given variables in the correct order
         
+        Returns: 
+            A, h, Q, q: the matrices for constraints Ax < h 
+                        and costs 0.5 * x.T @ Q @x - x.T * q
+                                            
+        """
         
         A, h = self.generate_all_qp_constraints(given)
         Q, q = self.generate_all_qp_costs(given)

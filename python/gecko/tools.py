@@ -119,13 +119,13 @@ def reduce_by_time(box, **kargs):
     box.scale_box(scale)
     
 def recenter_on_real_state_x(box, **kargs):
-    box.move_SS_box(new_center = kargs["x0_x"])
+    box.recenter_in_SS(new_center = kargs["x0_x"])
             
 def recenter_on_real_state_y(box, **kargs):
-    box.move_SS_box(new_center = kargs["x0_y"])
+    box.recenter_in_SS(new_center = kargs["x0_y"])
     
 def recenter_support(box, **kargs):
-    box.move_TS_box(new_center = kargs["s0"])
+    box.recenter_in_TS(new_center = kargs["s0"])
     
 def make_simetric_vertices(xy_corner):
     x_values = np.array([1, -1, -1, 1])[:, None] * xy_corner[0]

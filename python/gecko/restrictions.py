@@ -298,6 +298,7 @@ class Box:
         box.ts_orientation = [np.eye(box.ts_dimention)]
         box.ss_orientation = [np.eye(box.ss_dimention)]
         box.ts_vertices = vertices
+        box.schedule = schedule
         return box
     
     @classmethod        
@@ -321,6 +322,7 @@ class Box:
             box.ss_orientation = [np.eye(box.ss_dimention)]
             box.ts_orientation = [1]
             box.ss_vertices = vertices
+            box.schedule = schedule
         return box
     
     def recenter_in_TS(self, new_center):
@@ -348,6 +350,11 @@ class Box:
             center = boundary.SS_to_TS(new_center)
             boundary.update(center=center)
     
+    def reschedule(self, new_schedule):
+        self.schedule = new_schedule
+        for boundary in self.constraints:
+            boundary.update(schedule=self.schedule)
+        
     def translate_in_TS(self, translation):
         self.ts_center += translation
         for boundary in self.constraints:

@@ -45,8 +45,10 @@ class BodyTestCase(unittest.TestCase):
         cost2 = Cost("DCM_x", aim=2, weight=1)
         cost3 = Cost("CoM", aim=[50, 50], weight=100, axes=["_x", "_y"], 
                      schedule=range(8,9))
+        cost4 = Cost("DCM_x", aim=2, weight=1, cross="s_y", 
+                     cross_L=np.eye(9))
         
-#        SSbox = Box()
+        
         vertices = np.array([[0, 1], [1, 0], [0, -1], [-1, 0]])
         SSbox = Box.task_space("CoM", vertices, ["_x", "_y"])
         
@@ -59,6 +61,7 @@ class BodyTestCase(unittest.TestCase):
         self.cost1 = cost1
         self.cost2 = cost2
         self.cost3 = cost3
+        self.cost4 = cost4
         self.SSbox = SSbox
         
         self.optimization_domain = ["x0_x", "x0_y", "Ds_x", "Ds_y",
@@ -76,6 +79,7 @@ class BodyTestCase(unittest.TestCase):
         body.incorporate_goal("velocity", cost1)
         body.incorporate_goal("stability", cost2)
         body.incorporate_goal("terminal", cost3)
+        body.incorporate_goal("crossed", cost4)
         
         body.incorporate_box("kine", self.SSbox)
         
@@ -99,7 +103,7 @@ class BodyTestCase(unittest.TestCase):
         self.assertTrue("DCM_x" in self.body.definitions.keys())
         self.assertTrue(isinstance(self.body.definitions["DCM_y"], LineCombo))
             
-    def test_qp_prob(self):
+    def test_qp_problem(self):
         
         self.body.identify_qp_domain(self.optimization_domain)
         
@@ -135,6 +139,11 @@ class BodyTestCase(unittest.TestCase):
                                     self.body.optim_len))
         self.assertEqual(q1.shape, (self.body.optim_len, 1))
         
+        cQ, cq = self.body.generate_qp_cost(self.cost4, given)
+        self.assertEqual(cQ.shape, (self.body.optim_len, 
+                                    self.body.optim_len))
+        self.assertEqual(cq.shape, (self.body.optim_len, 1))
+        
         Q, q = self.body.generate_all_qp_costs(given)
         self.assertEqual(Q.shape, (self.body.optim_len, 
                                     self.body.optim_len))
@@ -148,7 +157,7 @@ if __name__ == "__main__":
     o = BodyTestCase()
     o.setUp()
     o.test_incorporations()
-    o.test_qp_prob()
+    o.test_qp_problem()
     
     
     
