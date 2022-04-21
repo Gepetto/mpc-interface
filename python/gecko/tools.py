@@ -57,17 +57,20 @@ def update_step_matrices(extSyst, **kargs):
         regular_time = kargs["regular_time"]
         step_times = None
         
-        
     else:
         raise KeyError("This funtion needs either 'step_times' or "+
                        "'regular_time', but the kargs "+
                        "introduced are {}".format(kargs.keys()))
+    
+    if "w_phase" in kargs.keys():
+        walking_phase = kargs["w_phase"]
+    else:
+        walking_phase = 0
         
-    U = plan_steps(N, count, step_times, regular_time)
+    U = plan_steps(N, count, step_times, regular_time, walking_phase)
     extSyst.matrices[0] = U[:, :, None]
     
-    ### TODO: add if count is None --> count=0 to take step_times that are refered to the present.
-def plan_steps(N, count=0, step_times=None, regular_time=None):
+def plan_steps(N, count=0, step_times=None, regular_time=None, phase=0):
     
     preview_times = count + np.arange(N)
     
@@ -77,15 +80,54 @@ def plan_steps(N, count=0, step_times=None, regular_time=None):
 
     elif regular_time is not None:
         next_steps = np.array([time for time in preview_times
-                               if not (time+2)%regular_time
+                               if not (time+phase)%regular_time
                                and time < count+N-1])
     else:
         msg = "either the step_times or some "+\
         "regular_time for steps must be provided"
-        raise AssertionError(msg)
-        
+        raise KeyError(msg)
+    
     E = (preview_times.reshape([N, 1]) > next_steps).astype(int)
     return E
+## TODO: separate the time_planning for steps from the matrix generation.
+    ## Because the planning is useful for other fucntions.
+    
+def count_yawls(domVar, **kargs):
+    count = 0 if "count" not in kargs else kargs["count"]
+    m = n_predicted_steps(count,
+                          kargs["N"],
+                          kargs["step_times"])
+    
+    domVar.domain["yawl"] = m
+    
+def step_average_velocity(count, N, step_times):
+        
+    preview_times = count + np.arange(N)
+    next_steps = np.hstack([step_times[(step_times >= count) * 
+                            (step_times < count+N-1)], count+N-1])
+    initial = (next_steps[:-1].reshape([-1, 1]) == preview_times).astype(int)
+    final = (next_steps[1:].reshape([-1, 1]) == preview_times).astype(int)
+    
+    dt = next_steps[1:] - next_steps[:-1]
+    L = (final - initial)/dt[:, None]
+    return np.hstack([L, L])
+    
+def linear_Rotations(old_yawls):
+        
+    old_sin = np.sin(old_yawls)
+    old_cos = np.cos(old_yawls)
+    
+    cos_sin = np.vstack([old_cos[:, None], old_sin[:, None]])
+    
+    L = np.vstack([np.diag(-old_sin),
+                   np.diag( old_cos)])
+    
+    return L, L @ old_yawls[:, None] - cos_sin
+    
+def n_predicted_steps(count, N, step_times):
+    next_steps = step_times[(step_times >= count) * 
+                            (step_times < count+N-1)]
+    return next_steps.size
 
 def update_stepping_area(box, **kargs):
     next_centers = find_step_centers(kargs["step_count"],
@@ -144,6 +186,29 @@ def adapt_size(stamps, **kargs):
     
     stamps.matrices[Ds_coeff_ID] = np.tril(np.ones([size+1, size]), -1)
     stamps.matrices[s0_coeff_ID] = np.ones([size+1, 1])
+    
+def rotation2D(angle):
+    return np.array([[np.cos(angle), -np.sin(angle)],
+                     [np.sin(angle), np.cos(angle)]])    
+    
+def rotation3D(angle, axis="z"):
+    rot_2d = rotation2D(angle)
+    R = np.zeros([3, 3])
+    if axis == "x":
+        R[0, 0] = 1
+        R[1:3, 1:3] = rot_2d
+
+    elif axis == "y":
+        R[1, 1] = 1
+        R[[0, 2, 0, 2], [0, 0, 2, 2]] = rot_2d.flatten()
+
+    elif axis == "z":
+        R[2, 2] = 1
+        R[0:2, 0:2] = rot_2d
+        
+    return R
+
+
               
 def get_system_matrices(system):
     """

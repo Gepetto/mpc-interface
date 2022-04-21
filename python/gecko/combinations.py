@@ -43,3 +43,6 @@ class LineCombo:
                               for coef, var in zip(self._coefficients,
                                                    self.variables))
         return comb_text
+
+## TODO: additionally to LineCombo, it would be useful to add an other 
+        # form of combunation "concatenate"

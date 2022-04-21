@@ -39,7 +39,7 @@ class Cost:
         When 'cross' is provided, the cost works with the crossed produc
         making
         
-            ( V-aim ) * ( C-cross_aim ) --> 0
+            ( V - aim ) * ( C - cross_aim ) --> 0
         
         where C is:
             
