@@ -13,7 +13,7 @@ import unittest
 
 import numpy as np
 
-from gecko.goal import Cost
+from mpc_core.goal import Cost
 
 class GoalTestCase(unittest.TestCase):
     def setUp(self):

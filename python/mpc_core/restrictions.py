@@ -7,7 +7,7 @@ Created on Sun Jan 17 17:04:15 2021
 """
 import numpy as np
 import scipy.spatial as sp
-import gecko.tools as use
+import mpc_core.tools as use
 
 ## TODO: make some visualization of the constraints graphically
 

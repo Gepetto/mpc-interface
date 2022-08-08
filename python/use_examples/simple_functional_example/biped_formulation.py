@@ -8,12 +8,12 @@ Created on Sun Mar 20 20:15:40 2022
 
 import numpy as np
 
-from gecko.dynamics import ControlSystem, ExtendedSystem, DomainVariable
-from gecko.body import Formulation
-import gecko.tools as now
-from gecko.restrictions import Box
-from gecko.goal import Cost
-from gecko.combinations import LineCombo
+from mpc_core.dynamics import ControlSystem, ExtendedSystem, DomainVariable
+from mpc_core.body import Formulation
+import mpc_core.tools as now
+from mpc_core.restrictions import Box
+from mpc_core.goal import Cost
+from mpc_core.combinations import LineCombo
 
 import biped_configuration as config ## TODO: isolate the configuration corresponding to this script and the MPC
 

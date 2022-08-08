@@ -11,12 +11,12 @@ Created on Sat Feb  5 16:21:03 2022
 import unittest
 
 import numpy as np
-from gecko.dynamics import ControlSystem, ExtendedSystem, DomainVariable
-from gecko.body import Formulation
-import gecko.tools as use
-from gecko.restrictions import Constraint, Box
-from gecko.goal import Cost
-from gecko.combinations import LineCombo
+from mpc_core.dynamics import ControlSystem, ExtendedSystem, DomainVariable
+from mpc_core.body import Formulation
+import mpc_core.tools as use
+from mpc_core.restrictions import Constraint, Box
+from mpc_core.goal import Cost
+from mpc_core.combinations import LineCombo
 
 class BodyTestCase(unittest.TestCase):
     def setUp(self):

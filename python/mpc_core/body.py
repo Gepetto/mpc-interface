@@ -6,7 +6,7 @@ Created on Tue Feb  1 20:07:59 2022
 @author: nvilla
 """
 import numpy as np
-import gecko.tools as use
+import mpc_core.tools as use
 #from scipy import sparse
 
 class Formulation:

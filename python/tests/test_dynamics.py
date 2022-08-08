@@ -15,8 +15,8 @@ from matplotlib import colors
 import numpy as np
 from collections.abc import Iterable
 
-import gecko.dynamics as dy
-import gecko.tools as use
+import mpc_core.dynamics as dy
+import mpc_core.tools as use
 import pickle
 
 class DynamicsTestCase(unittest.TestCase):
@@ -115,6 +115,7 @@ class DynamicsTestCase(unittest.TestCase):
     def test_extended_matrices(self):
         with (Path(__file__).parent / "LIP_matrices").open("rb") as f:
             saved_matrices = pickle.load(f)["matrices"]
+        
         
         LIP = dy.ControlSystem.from_name(system_name = 'J->CCC',
                                       tau = 0.1,

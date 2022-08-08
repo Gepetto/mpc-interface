@@ -7,12 +7,12 @@ Created on Tue Feb  8 16:08:02 2022
 """
 import numpy as np
 
-from gecko.dynamics import ControlSystem, ExtendedSystem, DomainVariable
-from gecko.body import Formulation
-import gecko.tools as now
-from gecko.restrictions import Box
-from gecko.goal import Cost
-from gecko.combinations import LineCombo
+from mpc_core.dynamics import ControlSystem, ExtendedSystem, DomainVariable
+from mpc_core.body import Formulation
+import mpc_core.tools as now
+from mpc_core.restrictions import Box
+from mpc_core.goal import Cost
+from mpc_core.combinations import LineCombo
 from cricket import closed_loop_tools as clt
 
 import cricket.talos_conf as config
