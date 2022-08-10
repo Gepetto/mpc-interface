@@ -13,8 +13,8 @@
 #include <iostream>
 
 // This repository includes
-#include <qp_formulations/tools.hh>
-#include <qp_formulations/dynamics.hh>
+#include <mpc-interface/tools.hh>
+#include <mpc-interface/dynamics.hh>
 
 namespace gecko {
 namespace tools {

@@ -4,11 +4,11 @@
 #include <boost/test/unit_test.hpp>
 
 // Project headers
-#include <qp_formulations/tools.hh>
+#include <mpc-interface/tools.hh>
 
 using namespace Eigen;
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
-  
+
 BOOST_AUTO_TEST_CASE(test_extend_matrices_body)
 {
 
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(test_extend_matrices_body)
   Eigen::Tensor<double, 3> S;
   Eigen::Tensor<double, 4> U;
   unsigned int N=9;
-  
+
   gecko::tools::extend_matrices(S,U,N,A,B);
 }
 
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test_extend_matrices_dynamics)
   Eigen::Tensor<double, 3> S;
   Eigen::Tensor<double, 4> U;
   unsigned int N=20;
-  
+
   gecko::tools::extend_matrices(S,U,N,A,B);
 
 }

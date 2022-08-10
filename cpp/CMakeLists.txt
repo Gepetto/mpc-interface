@@ -1,4 +1,4 @@
-# Create target libqp_formulations.so
+# Create target libmpc-interface.so
 
 ## Specify sources
 SET(${PROJECT_NAME}_HEADERS
@@ -11,6 +11,9 @@ SET(${PROJECT_NAME}_SOURCES
 ## Create library
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_SOURCES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 # Install procedure
 INSTALL(TARGETS ${PROJECT_NAME}
