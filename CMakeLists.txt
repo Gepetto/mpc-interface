@@ -14,6 +14,7 @@ set(PROJECT_USE_KEYWORD_LINK_LIBRARIES TRUE)
 # Disable -Werror on Unix for now.
 set(CXX_DISABLE_WERROR True)
 set(CMAKE_VERBOSE_MAKEFILE True)
+set(CUSTOM_HEADER_DIR ${PROJECT_NAME})
 
 # --- OPTIONS  ---------------------------------------
 # Need to be set before including base.cmake
