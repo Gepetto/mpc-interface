@@ -58,7 +58,7 @@ include(${JRL_CMAKE_MODULES}/apple.cmake)
 check_minimal_cxx_standard(14 ENFORCE)
 
 # Specifies dependencies
-
+findpython(REQUIRED)
 add_project_dependency(Eigen3 REQUIRED PKG_CONFIG_REQUIRES "eigen3 >= 3.0.5")
 if(BUILD_TESTING)
   find_package(Boost REQUIRED COMPONENTS unit_test_framework)
