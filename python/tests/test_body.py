@@ -138,16 +138,15 @@ class BodyTestCase(unittest.TestCase):
         A, h = self.body.generate_qp_constraint(self.limit, given)
 
         self.assertEqual(h.shape, (9, 1))
-        self.assertTrue(
-            (h == self.limit.bound()).all()
-        )  # given doesn't affect this inequality
+        # given doesn't affect this inequality
+        self.assertTrue((h == self.limit.bound()).all())
         self.assertEqual(A.shape, (9, self.body.optim_len))
 
         A2, h2 = self.body.generate_all_qp_constraints(given)
         self.assertEqual(h2.shape, (54, 1))
         self.assertEqual(A2.shape, (54, self.body.optim_len))
 
-        ### COSTS
+        # ## COSTS
         self.assertTrue(self.body.goals)
 
         Q1, q1 = self.body.generate_qp_cost(self.cost1, given)

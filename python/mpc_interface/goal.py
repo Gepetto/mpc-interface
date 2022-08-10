@@ -93,11 +93,10 @@ class Cost:
             arranged_L = arranged_L * self.axes_len
         elif len(arranged_L) not in (self.axes_len, 0):
             raise IndexError(
-                "'L' must have 0, 1 or len(axes) = {} "
-                + "elements".format(self.axes_len)
+                "'L' must have 0, 1 or len(axes) = {} elements".format(self.axes_len)
             )
 
-        if self.schedule and np.any([l.shape[-1] != self.t for l in arranged_L]):
+        if self.schedule and np.any([al.shape[-1] != self.t for al in arranged_L]):
             raise ValueError(
                 "arrays in L must have {} ".format(self.t)
                 + "columns, which is given by the 'schedule'."

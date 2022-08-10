@@ -9,7 +9,7 @@ import numpy as np
 import scipy.spatial as sp
 import mpc_interface.tools as use
 
-## TODO: make some visualization of the constraints graphically
+# # TODO: make some visualization of the constraints graphically
 
 
 class Constraint:
@@ -80,11 +80,10 @@ class Constraint:
             self.L = self.L * self.axes_len
         elif len(self.L) not in (self.axes_len, 0):
             raise IndexError(
-                "'L' must have 0, 1 or len(axes) = {} "
-                + "elements".format(self.axes_len)
+                "'L' must have 0, 1 or len(axes) = {} elements".format(self.axes_len)
             )
 
-        if self.schedule and np.any([l.shape[-1] != self.t for l in self.L]):
+        if self.schedule and np.any([sl.shape[-1] != self.t for sl in self.L]):
             raise ValueError(
                 "arrays in L must have {} ".format(self.t)
                 + "columns, which is given by the 'schedule'."
@@ -246,7 +245,7 @@ class Constraint:
         """
         if self.L:
             return np.vstack(
-                [(l @ p.T) for l, p in zip(self.L, np.transpose(ss_point))]
+                [(ll @ p.T) for ll, p in zip(self.L, np.transpose(ss_point))]
             ).T
         return ss_point
 
@@ -268,7 +267,7 @@ class Constraint:
 
         text = "\nvariable: " + self.variable + axes
         text += (
-            "\nwith L = " + str(",\n".join(str(l) for l in self.L))
+            "\nwith L = " + str(",\n".join(str(ll) for ll in self.L))
             if self.L != []
             else ""
         )
@@ -391,7 +390,7 @@ class Box:
     def recenter_in_SS(self, new_center):
         c_shape = np.shape(new_center)
         correct_forms = ((self.ss_dimention, self.ts_dimention), (self.ts_dimention,))
-        if not c_shape in correct_forms:
+        if c_shape not in correct_forms:
             raise ValueError(
                 (
                     "The 'new_center' must have {} "
@@ -418,7 +417,7 @@ class Box:
     def translate_in_SS(self, translation):
         c_shape = np.shape(translation)
         correct_forms = ((self.ss_dimention, self.ts_dimention), (self.ts_dimention,))
-        if not c_shape in correct_forms:
+        if c_shape not in correct_forms:
             raise ValueError(
                 (
                     "The 'new_center' must have {} "
@@ -440,7 +439,7 @@ class Box:
 
         if len(rotations) != N and len(rotations) != 1:
             raise IndexError(
-                "'rotations' must contain 1 or {} rotation " + "matrices".format(N)
+                "'rotations' must contain 1 or {} rotation matrices".format(N)
             )
 
         if len(rotations) == 1:
@@ -455,8 +454,8 @@ class Box:
             new_arrows = [n @ R.T for R, n in zip(rotations, arrows)]
             boundary.update(arrow=np.vstack(new_arrows))
 
-        ##TODO: Would it be needed to make an accumulation of rotations along the horizon?
-        ##       or it is correct as it is now?
+        # #TODO: Would it be needed to make an accumulation of rotations along the
+        # horizon?  or it is correct as it is now?
 
     def rotate_in_SS(self, rotations):
         raise NotImplementedError("Maybe later.")

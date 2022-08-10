@@ -101,8 +101,8 @@ def plan_steps(N, count=0, step_times=None, regular_time=None, phase=0):
     return E
 
 
-## TODO: separate the time_planning for steps from the matrix generation.
-## Because the planning is useful for other fucntions.
+# # TODO: separate the time_planning for steps from the matrix generation.
+# # Because the planning is useful for other fucntions.
 
 
 def count_yawls(domVar, **kargs):

@@ -22,7 +22,7 @@ import pickle
 
 class DynamicsTestCase(unittest.TestCase):
     def setUp(self):
-        #### Settings for control systems
+        # ### Settings for control systems
 
         inputs = ["u0", "u1", "u2", "u3", "u4", "u5"]
         states = ["s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7"]
@@ -68,7 +68,7 @@ class DynamicsTestCase(unittest.TestCase):
         self.states = states
         self.axes = axes
 
-        #### Setting extended control systems
+        # ### Setting extended control systems
         horizon_lenght = 20
 
         ext_sys1 = dy.ExtendedSystem.from_cotrol_system(cnt_sys1, "x", horizon_lenght)
@@ -79,7 +79,7 @@ class DynamicsTestCase(unittest.TestCase):
         self.ext_sys3 = ext_sys3
         self.N = horizon_lenght
 
-        ##### Settings for single variable
+        # #### Settings for single variable
         def in_this_way(singVar, **kargs):
             if isinstance(kargs["new_sizes"], Iterable):
                 sizes = kargs["new_sizes"]
@@ -162,7 +162,7 @@ class DynamicsTestCase(unittest.TestCase):
             len(self.ext_sys1.all_variables), len(self.ext_sys1.definitions.keys())
         )
 
-        ## Composed updates:
+        # # Composed updates:
 
         self.assertEqual(len(self.ext_sys1.matrices), m + 1)
         self.assertEqual(self.ext_sys1.matrices[-1].shape, (self.N, n, n))

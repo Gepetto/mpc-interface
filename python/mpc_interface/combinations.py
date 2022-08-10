@@ -48,5 +48,5 @@ class LineCombo:
         return comb_text
 
 
-## TODO: additionally to LineCombo, it would be useful to add an other
+# # TODO: additionally to LineCombo, it would be useful to add an other
 # form of combunation "concatenate"

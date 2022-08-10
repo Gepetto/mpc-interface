@@ -28,11 +28,11 @@ class Controller:
             variable: self.form.preview(self.given, self.optim, variable)
             for variable in self.form.definitions.keys()
         }
-        ### motion initialization:
+        # ## motion initialization:
         self.motion["x0_y"][0] = conf.strt_y
         self.motion["s0_y"][0] = conf.strt_y
 
-        ### additional fields:
+        # ## additional fields:
         self.step_count = 0
         self.n = conf.step_samples
         self.motion["step_times"] = np.array(
@@ -101,6 +101,6 @@ if __name__ == "__main__":
         o.preview_all()  # o.preview_horizon()
         o.plot_horizon(time, "_y")
 
-        ########### ~~~ Change of time ~~~ ###############
+        # ########## ~~~ Change of time ~~~ ###############
         o.update_given_collector()
         o.count_steps()

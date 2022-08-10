@@ -123,9 +123,11 @@ class DomainVariable:
         self.update_definitions()
 
 
-## TODO: Make a form to deal with axis names longer (or shorter) than 2 characters or rise an error when the axes have more (or less) than 2 characters
-## TODO: the previous point can be done with variables of hte form tuple(name, axis) which is immutable and we can separate name and axis easily.
-## TODO: Report some how what should be in the **kargs for update functions
+# # TODO: Make a form to deal with axis names longer (or shorter) than 2 characters or
+# rise an error when the axes have more (or less) than 2 characters
+# # TODO: the previous point can be done with variables of hte form tuple(name, axis)
+# which is immutable and we can separate name and axis easily.
+# # TODO: Report some how what should be in the **kargs for update functions
 class ExtendedSystem:
     def __init__(
         self,
@@ -390,7 +392,7 @@ class ControlSystem:
         try:
             A = get_A(**kargs)
             B = get_B(**kargs)
-        except:
+        except Exception:
             raise ValueError("This system formulation requires: " + str(parameters))
 
         self = cls(

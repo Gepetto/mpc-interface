@@ -45,7 +45,7 @@ class GoalTestCase(unittest.TestCase):
         self.assertTrue(self.cost3.cross_L == [])
         self.assertTrue(self.cost3.aim == 0)
         self.assertTrue(self.cost3.cross_aim == 0)
-        self.assertTrue(not self.cost3.aim is self.cost3.cross_aim)
+        self.assertTrue(self.cost3.aim is not self.cost3.cross_aim)
 
         self.assertTrue(self.cost4.cross_L == [5, 2])
 

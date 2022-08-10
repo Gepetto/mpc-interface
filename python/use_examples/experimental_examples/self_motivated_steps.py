@@ -24,9 +24,9 @@ def formulate_biped(conf):
     horizon_lenght = conf.horizon_lenght
     step_samples = conf.step_samples
     system = conf.system
-    #### DYNAMICS AND DOMAIN VARIABLES ~~~~~~~~~~~~~~~~~~~~
+    # ### DYNAMICS AND DOMAIN VARIABLES ~~~~~~~~~~~~~~~~~~~~
     axes = ["_x", "_y"]
-    ##~Steps~##
+    # #~Steps~##
     E = now.plan_steps(horizon_lenght, 0, regular_time=step_samples)
     F = np.ones([horizon_lenght, 1])
 
@@ -44,14 +44,14 @@ def formulate_biped(conf):
         "stamps", {"s0": 1, "Ds": 1}, time_variant=True, how_to_update=now.adapt_size
     )
 
-    ##~LIP~##
+    # #~LIP~##
     LIP = ControlSystem.from_name(system, axes, tau=conf.mpc_period, omega=w)
     LIP_ext = ExtendedSystem.from_cotrol_system(LIP, "x", horizon_lenght)
 
-    ##~Non-Linearity~##
+    # #~Non-Linearity~##
     bias = DomainVariable("n", horizon_lenght, axes)
 
-    ##EXTRA DEFINITIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # #EXTRA DEFINITIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     n_coeff = np.diag(np.ones([horizon_lenght - 1]), 1)
 
     some_defs = {}
@@ -73,7 +73,7 @@ def formulate_biped(conf):
                 }
             )
 
-    ##CONSTRAINTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # #CONSTRAINTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     support_vertices = now.make_simetric_vertices(conf.foot_corner)
 
     support_polygon = Box.task_space("(b+n-s)", support_vertices, axes)
@@ -115,7 +115,7 @@ def formulate_biped(conf):
     support_polygon.set_safety_margin(cop_safety_margin)
     terminal_constraint.set_safety_margin(cop_safety_margin)
 
-    ##COSTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # #COSTS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     relax_ankles_x = Cost(
         "(b+n-s)", conf.cost_weights["relax ankles"], aim=[0], axes=["_x"]
     )
@@ -145,7 +145,7 @@ def formulate_biped(conf):
         schedule=range(horizon_lenght - 1, horizon_lenght),
     )
 
-    ##Formulation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # #Formulation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     form = Formulation()
     form.incorporate_dynamics("steps", steps)
     form.incorporate_dynamics("LIP", LIP_ext)
@@ -186,7 +186,7 @@ def formulate_biped(conf):
                     stepping_center : array from each step place to the center
                                       of next stepping area.
         """
-        ## TODO: Change regular_time for step_times.
+        # # TODO: Change regular_time for step_times.
         step_dynamics_keys = dict(step_times=kargs["step_times"], N=horizon_lenght)
         body.dynamics["steps"].update(**step_dynamics_keys)
 

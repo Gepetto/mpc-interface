@@ -41,10 +41,10 @@ class Formulation:
         self.of.update(
             {variable: name for variable in new_dynamics.all_variables.keys()}
         )
-        self.definitions.update(
-            new_dynamics.definitions
-        )  # This could go trough the function self.define.
-        # Thought it is different, domain variables depend on them selves, they wouldn't pass.
+        # This could go trough the function self.define.
+        self.definitions.update(new_dynamics.definitions)
+        # Thought it is different, domain variables depend on them selves,
+        # they wouldn't pass.
 
     def incorporate_definition(self, name, new_definition):
         for variable in new_definition.keys():
@@ -233,7 +233,7 @@ class Formulation:
             value += self.goal_distance(given, optim, goal_name)
         return value
 
-    def generate_qp_constraint(self, limit, given):  ## requires updated limit
+    def generate_qp_constraint(self, limit, given):  # # requires updated limit
 
         rows = self.PM[limit.variable + limit.axes[0]][0].shape[0]
         nlines = limit.nlines
@@ -328,7 +328,7 @@ class Formulation:
 
         return Q, q
 
-    ## TODO: we are missing equality constraints.
+    # # TODO: we are missing equality constraints.
 
     def generate_all_qp_matrices(self, given):
         """
