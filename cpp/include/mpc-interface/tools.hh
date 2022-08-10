@@ -21,14 +21,9 @@
 namespace gecko {
 namespace tools {
 
-
-void extend_matrices(Eigen::Tensor<double, 3> &S,
-                     Eigen::Tensor<double, 4> &U,
-                     unsigned int N,
-                     Eigen::MatrixXd &A,
-                     Eigen::MatrixXd &B);
+void extend_matrices(Eigen::Tensor<double, 3> &S, Eigen::Tensor<double, 4> &U,
+                     unsigned int N, Eigen::MatrixXd &A, Eigen::MatrixXd &B);
 
 }
 
-
-}
+}  // namespace gecko

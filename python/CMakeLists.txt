@@ -1,17 +1,16 @@
-SET(PYTHON_SOURCES
-  __init__.py
-  body.py
-  combinations.py
-  dynamics.py
-  goal.py
-  restrictions.py
-  tools.py
-  )
+set(PYTHON_SOURCES
+    __init__.py
+    body.py
+    combinations.py
+    dynamics.py
+    goal.py
+    restrictions.py
+    tools.py)
 
-FOREACH(source ${PYTHON_SOURCES})
-  PYTHON_INSTALL_ON_SITE(mpc_interface ${source})
-ENDFOREACH(source)
+foreach(source ${PYTHON_SOURCES})
+  python_install_on_site(mpc_interface ${source})
+endforeach(source)
 
-IF(BUILD_TESTING)
-  ADD_SUBDIRECTORY(tests)
-ENDIF()
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
