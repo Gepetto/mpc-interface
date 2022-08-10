@@ -68,3 +68,5 @@ add_subdirectory(cpp)
 
 # Python part, main code
 add_subdirectory(python)
+
+install(FILES package.xml DESTINATION share/${PROJECT_NAME})
