@@ -8,12 +8,12 @@ Created on Sun Mar 20 20:15:40 2022
 
 import numpy as np
 
-from mpc_core.dynamics import ControlSystem, ExtendedSystem, DomainVariable
-from mpc_core.body import Formulation
-import mpc_core.tools as now
-from mpc_core.restrictions import Box
-from mpc_core.goal import Cost
-from mpc_core.combinations import LineCombo
+from mpc_interface.dynamics import ControlSystem, ExtendedSystem, DomainVariable
+from mpc_interface.body import Formulation
+import mpc_interface.tools as now
+from mpc_interface.restrictions import Box
+from mpc_interface.goal import Cost
+from mpc_interface.combinations import LineCombo
 
 import biped_configuration as config ## TODO: isolate the configuration corresponding to this script and the MPC
 

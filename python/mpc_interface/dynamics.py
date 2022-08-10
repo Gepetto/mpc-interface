@@ -6,8 +6,8 @@ Created on Tue Feb  1 19:56:04 2022
 @author: nvilla
 """
 import numpy as np
-import mpc_core.tools as use
-from mpc_core.combinations import LineCombo
+import mpc_interface.tools as use
+from mpc_interface.combinations import LineCombo
 from collections.abc import Iterable
 
 """

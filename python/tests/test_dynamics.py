@@ -15,8 +15,8 @@ from matplotlib import colors
 import numpy as np
 from collections.abc import Iterable
 
-import mpc_core.dynamics as dy
-import mpc_core.tools as use
+import mpc_interface.dynamics as dy
+import mpc_interface.tools as use
 import pickle
 
 class DynamicsTestCase(unittest.TestCase):

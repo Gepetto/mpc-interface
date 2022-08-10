@@ -62,3 +62,6 @@ ENDIF()
 
 # C++ part, work in progress
 add_subdirectory(cpp)
+
+# Python part, main code
+add_subdirectory(python)

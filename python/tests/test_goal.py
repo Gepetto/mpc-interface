@@ -13,7 +13,7 @@ import unittest
 
 import numpy as np
 
-from mpc_core.goal import Cost
+from mpc_interface.goal import Cost
 
 class GoalTestCase(unittest.TestCase):
     def setUp(self):

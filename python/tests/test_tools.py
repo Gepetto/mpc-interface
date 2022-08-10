@@ -13,7 +13,7 @@ import unittest
 import numpy as np
 from random import randint
 
-import mpc_core.tools as use
+import mpc_interface.tools as use
 
 class ToolsTestCase(unittest.TestCase):
     

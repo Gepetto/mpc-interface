@@ -11,7 +11,7 @@ import unittest
 
 import numpy as np
 
-from mpc_core.restrictions import Constraint, Box
+from mpc_interface.restrictions import Constraint, Box
 
 class RestrictionsTestCase(unittest.TestCase):
     def setUp(self):

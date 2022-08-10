@@ -1,4 +1,4 @@
-import mpc_core.tools as use
+import mpc_interface.tools as use
 
 class LineCombo:
     def __init__(self, combination=None, data=None,

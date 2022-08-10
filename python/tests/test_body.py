@@ -11,12 +11,12 @@ Created on Sat Feb  5 16:21:03 2022
 import unittest
 
 import numpy as np
-from mpc_core.dynamics import ControlSystem, ExtendedSystem, DomainVariable
-from mpc_core.body import Formulation
-import mpc_core.tools as use
-from mpc_core.restrictions import Constraint, Box
-from mpc_core.goal import Cost
-from mpc_core.combinations import LineCombo
+from mpc_interface.dynamics import ControlSystem, ExtendedSystem, DomainVariable
+from mpc_interface.body import Formulation
+import mpc_interface.tools as use
+from mpc_interface.restrictions import Constraint, Box
+from mpc_interface.goal import Cost
+from mpc_interface.combinations import LineCombo
 
 class BodyTestCase(unittest.TestCase):
     def setUp(self):
