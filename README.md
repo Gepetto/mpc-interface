@@ -2,6 +2,10 @@
 
 # MPC interface
 
+[![Pipeline status](https://gitlab.laas.fr/gepetto/mpc-interface/badges/master/pipeline.svg)](https://gitlab.laas.fr/gepetto/mpc-interface/commits/master)
+[![Coverage report](https://gitlab.laas.fr/gepetto/mpc-interface/badges/master/coverage.svg?job=doc-coverage)](https://gepettoweb.laas.fr/doc/gepetto/mpc-interface/master/coverage/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/gepetto/mpc-interface/master.svg)](https://results.pre-commit.ci/latest/github/gepetto/mpc-interface)
 
 This package provides a structure to formulate QP based MPC problems with any linear dynamics, cost functions and constraint.
 All required QP matrices are generated automatically with the structure considered in [qpsolvers](https://scaron.info/doc/qpsolvers/).
