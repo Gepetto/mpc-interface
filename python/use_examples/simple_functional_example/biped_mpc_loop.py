@@ -13,6 +13,7 @@ from biped_formulation import formulate_biped
 from qpsolvers import osqp_solve_qp
 import scipy.sparse as sy
 
+
 class Controller:
     def __init__(self, conf):
         self.N = conf.horizon_lenght
@@ -65,7 +66,7 @@ class Controller:
 
     def plot_horizon(self, fig, time, axis):
 
-        times = (time + np.arange(0, self.N))*self.dt
+        times = (time + np.arange(0, self.N)) * self.dt
 
         plt.pause(0.03)
         fig.clear()
