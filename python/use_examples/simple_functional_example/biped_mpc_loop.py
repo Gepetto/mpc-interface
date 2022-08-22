@@ -8,6 +8,7 @@ Created on Sun Mar 20 20:36:32 2022
 
 import numpy as np
 import matplotlib.pyplot as plt
+plt.ion()
 import biped_configuration as config
 from biped_formulation import formulate_biped
 
@@ -64,16 +65,18 @@ class Controller:
         for variable in self.form.definitions:
             self.motion[variable] = self.form.preview(self.given, self.optim, variable)
 
-    def plot_horizon(self, time, axis):
+    def plot_horizon(self, fig, time, axis):
 
         times = time + np.arange(0, self.N)
-        fig = plt.figure()
+        
+        plt.pause(0.03)
+        fig.clear()
         ax = fig.gca()
         ax.plot(times, self.motion["CoM" + axis])
         ax.plot(times, self.motion["b" + axis])
         ax.plot(times, self.motion["DCM" + axis])
         ax.plot(times, self.motion["s" + axis], "+")
-
+        
     def update_given_collector(self):
         for state, ID in self.form.dynamics["LIP"].state_ID.items():
             axis = state[-2:]
@@ -92,14 +95,17 @@ class Controller:
 
 
 if __name__ == "__main__":
+    fig = plt.figure()
+    
     o = Controller(config)
 
     for time in range(100):
 
         o.decide_actions(time)
-        o.preview_all()  # o.preview_horizon()
-        o.plot_horizon(time, "_y")
-
+        o.preview_all()
+        o.plot_horizon(fig, time, "_y")
         # ########## ~~~ Change of time ~~~ ###############
         o.update_given_collector()
         o.count_steps()
+
+    print("End")
