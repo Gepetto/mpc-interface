@@ -11,7 +11,7 @@ This repository is mainly based on python, the c++ part is a work in progress wh
 
 ## Dependancies
 
-`mpc_interface` depends on standard python libraries and qpsolvers + osqp for the examples.
+`mpc_interface` depends on standard python libraries and `qpsolvers` + `osqp` for the examples.
 
 ### Standard python packages
 
