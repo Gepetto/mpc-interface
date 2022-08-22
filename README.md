@@ -38,7 +38,7 @@ pip3 install qpsolvers osqp
 A better explanation is comming soon.
 For now, an embryonary explanation of the repository classes is provided in [`biped_formulation.py`](https://github.com/Gepetto/mpc-interface/blob/main/python/use_examples/simple_functional_example/biped_formulation.py)
 
-### Tests 
+### Tests
 
 Run all the tests with:
 
@@ -50,11 +50,8 @@ python3 -m unittest discover python/tests
 
 Available examples are in the folder [`python/use_examples`](https://github.com/Gepetto/mpc-interface/tree/main/python/use_examples)
 
-Run the starting example with 
+Run the starting example with
 
 ```bash
 ipython python/use_examples/simple_functional_example/biped_mpc_loop.py
 ```
-
-
-

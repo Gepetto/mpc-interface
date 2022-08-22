@@ -8,6 +8,7 @@ Created on Sun Mar 20 20:36:32 2022
 
 import numpy as np
 import matplotlib.pyplot as plt
+
 plt.ion()
 import biped_configuration as config
 from biped_formulation import formulate_biped
@@ -68,7 +69,7 @@ class Controller:
     def plot_horizon(self, fig, time, axis):
 
         times = time + np.arange(0, self.N)
-        
+
         plt.pause(0.03)
         fig.clear()
         ax = fig.gca()
@@ -76,7 +77,7 @@ class Controller:
         ax.plot(times, self.motion["b" + axis])
         ax.plot(times, self.motion["DCM" + axis])
         ax.plot(times, self.motion["s" + axis], "+")
-        
+
     def update_given_collector(self):
         for state, ID in self.form.dynamics["LIP"].state_ID.items():
             axis = state[-2:]
@@ -96,7 +97,7 @@ class Controller:
 
 if __name__ == "__main__":
     fig = plt.figure()
-    
+
     o = Controller(config)
 
     for time in range(100):
