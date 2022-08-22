@@ -8,14 +8,10 @@ Created on Sun Mar 20 20:36:32 2022
 
 import numpy as np
 import matplotlib.pyplot as plt
-
-plt.ion()
 import biped_configuration as config
 from biped_formulation import formulate_biped
-
 from qpsolvers import osqp_solve_qp
 import scipy.sparse as sy
-
 
 class Controller:
     def __init__(self, conf):
@@ -24,6 +20,7 @@ class Controller:
         self.form = formulate_biped(conf)
         self.optim = np.zeros([self.form.optim_len, 1])
         self.given = np.zeros([self.form.given_len, 1])
+        self.dt = conf.mpc_period
 
         self.motion = {
             variable: self.form.preview(self.given, self.optim, variable)
@@ -68,7 +65,7 @@ class Controller:
 
     def plot_horizon(self, fig, time, axis):
 
-        times = time + np.arange(0, self.N)
+        times = (time + np.arange(0, self.N))*self.dt
 
         plt.pause(0.03)
         fig.clear()
@@ -77,6 +74,8 @@ class Controller:
         ax.plot(times, self.motion["b" + axis])
         ax.plot(times, self.motion["DCM" + axis])
         ax.plot(times, self.motion["s" + axis], "+")
+        ax.set_title("Preview Horizon")
+        ax.set_xlabel("time [s]")
 
     def update_given_collector(self):
         for state, ID in self.form.dynamics["LIP"].state_ID.items():
@@ -96,6 +95,7 @@ class Controller:
 
 
 if __name__ == "__main__":
+    plt.ion()
     fig = plt.figure()
 
     o = Controller(config)
