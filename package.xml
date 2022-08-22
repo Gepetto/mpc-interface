@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>mpc-interface</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <description>A fast and flexible formulation of QP Probl</description>
   <maintainer email="guilhem.saurel@laas.fr">Guilhem Saurel</maintainer>
   <author>Nahuel Villa</author>
