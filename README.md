@@ -15,16 +15,23 @@ This repository is mainly based on python, the c++ part is a work in progress wh
 
 ### Standard python packages
 
-[`pip3 install numpy`](https://numpy.org/install/)
-[`pip3 install sympy`](https://pypi.org/project/sympy/)
-[`pip3 install matplotlib`](https://matplotlib.org/stable/users/installing/index.html)
-[`pip3 install scipy`](https://scipy.org/install/)
+[`numpy`](https://numpy.org/install/)
+[`sympy`](https://pypi.org/project/sympy/)
+[`matplotlib`](https://matplotlib.org/stable/users/installing/index.html)
+[`scipy`](https://scipy.org/install/)
 
+```bash
+pip3 install numpy sympy matplotlib scipy
+```
 
 ### External packages
 
-[`pip3 install qpsolvers`](https://pypi.org/project/qpsolvers/)
-[`pip3 install osqp`](https://osqp.org/docs/get_started/python.html)
+[`qpsolvers`](https://pypi.org/project/qpsolvers/)
+[`osqp`](https://osqp.org/docs/get_started/python.html)
+
+```bash
+pip3 install qpsolvers osqp
+```
 
 ## Usage
 
