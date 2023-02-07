@@ -106,7 +106,6 @@ class Cost:
     def update(
         self, aim=None, weight=None, L=None, schedule=None, cross_aim=None, cross_L=None
     ):
-
         if schedule is not None:
             self.schedule = schedule
 

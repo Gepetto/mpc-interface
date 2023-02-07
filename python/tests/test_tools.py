@@ -17,7 +17,6 @@ import mpc_interface.tools as use
 
 class ToolsTestCase(unittest.TestCase):
     def test_extend_matrices(self):
-
         n = randint(1, 15)  # number of states
         m = randint(1, 15)  # number of inputs
         N = randint(1, 100)  # horizon lenght

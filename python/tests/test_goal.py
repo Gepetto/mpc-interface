@@ -16,7 +16,6 @@ from mpc_interface.goal import Cost
 
 class GoalTestCase(unittest.TestCase):
     def setUp(self):
-
         cost1 = Cost("CoM", 8)
         cost2 = Cost("CoM", 8, aim=[8, 0], axes=["_x", "_y"])
         cost3 = Cost("f", 4, cross="u")
@@ -28,7 +27,6 @@ class GoalTestCase(unittest.TestCase):
         self.cost4 = cost4
 
     def test_constructor(self):
-
         self.assertTrue(self.cost1.variable == "CoM")
         self.assertTrue(self.cost1.aim == 0)
         self.assertTrue(self.cost1.aim is self.cost1.cross_aim)
@@ -50,7 +48,6 @@ class GoalTestCase(unittest.TestCase):
         self.assertTrue(self.cost4.cross_L == [5, 2])
 
     def test_update(self):
-
         self.cost1.update(aim=9)
         self.cost1.update(weight=0)
         self.cost1.update(L=4 * np.eye(3))
@@ -73,5 +70,4 @@ class GoalTestCase(unittest.TestCase):
 
 
 if __name__ == "__main__":
-
     unittest.main()

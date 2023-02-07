@@ -30,7 +30,6 @@ class DomainVariable:
     def __init__(
         self, names, sizes, axes=None, time_variant=False, how_to_update_size=None
     ):
-
         if isinstance(names, str):
             names = [names]
 
@@ -69,7 +68,6 @@ class DomainVariable:
             self.__figuring_out = how_to_update_size
 
     def identify_domain(self, names):
-
         self.domain_ID = {}
         for axis in self.axes:
             self.domain_ID.update(
@@ -140,7 +138,6 @@ class ExtendedSystem:
         time_variant=False,
         how_to_update_matrices=None,
     ):
-
         """This class works with a dynamics of the form:
 
         x = S*x0 + U*u
@@ -215,7 +212,6 @@ class ExtendedSystem:
 
     @classmethod
     def from_cotrol_system(cls, control_system, state_vector_name, horizon_lenght):
-
         S, U = use.extend_matrices(horizon_lenght, control_system.A, control_system.B)
         if control_system.time_variant:
 
@@ -246,7 +242,6 @@ class ExtendedSystem:
         return self
 
     def identify_domain(self, input_names, state_names):
-
         domain_ID = {name: index for index, name in enumerate(input_names)}
         domain_ID.update({self.state_vector_name + "0": len(input_names)})
         state_ID = {name: index for index, name in enumerate(state_names)}
@@ -355,7 +350,6 @@ class ControlSystem:
         time_variant=False,
         how_to_update_matrices=None,
     ):
-
         self.state_names = state_names
         self.input_names = input_names
         self.A = A
@@ -385,7 +379,6 @@ class ControlSystem:
         how_to_update_matrices=None,
         **kargs
     ):
-
         input_names, state_names = use.get_system_variables(system_name)
 
         get_A, get_B, parameters = use.get_system_matrices(system_name)

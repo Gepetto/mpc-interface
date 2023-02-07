@@ -77,7 +77,6 @@ def update_step_matrices(extSyst, **kargs):
 
 
 def plan_steps(N, count=0, step_times=None, regular_time=None, phase=0):
-
     preview_times = count + np.arange(N)
 
     if step_times is not None:
@@ -113,7 +112,6 @@ def count_yawls(domVar, **kargs):
 
 
 def step_average_velocity(count, N, step_times):
-
     preview_times = count + np.arange(N)
     next_steps = np.hstack(
         [
@@ -130,7 +128,6 @@ def step_average_velocity(count, N, step_times):
 
 
 def linear_Rotations(old_yawls):
-
     old_sin = np.sin(old_yawls)
     old_cos = np.cos(old_yawls)
 

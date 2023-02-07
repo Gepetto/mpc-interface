@@ -60,12 +60,10 @@ class Controller:
         self.optim = osqp_solve_qp(P=Q, q=q, G=A, h=h).reshape([-1, 1])
 
     def preview_all(self):
-
         for variable in self.form.definitions:
             self.motion[variable] = self.form.preview(self.given, self.optim, variable)
 
     def plot_horizon(self, fig, time, axis):
-
         times = (time + np.arange(0, self.N)) * self.dt
 
         plt.pause(0.03)
@@ -102,7 +100,6 @@ if __name__ == "__main__":
     o = Controller(config)
 
     for time in range(100):
-
         o.decide_actions(time)
         o.preview_all()
         o.plot_horizon(fig, time, "_y")

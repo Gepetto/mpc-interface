@@ -5,7 +5,6 @@ class LineCombo:
     def __init__(
         self, combination=None, data=None, how_to_update=None, time_variant=False
     ):
-
         if combination is not None:
             variables, matrices = zip(*combination.items())
             self.variables = list(variables)
@@ -40,7 +39,6 @@ class LineCombo:
         return self.__repr__()
 
     def __repr__(self):
-
         comb_text = " + ".join(
             coef + " ( " + var + " )"
             for coef, var in zip(self._coefficients, self.variables)

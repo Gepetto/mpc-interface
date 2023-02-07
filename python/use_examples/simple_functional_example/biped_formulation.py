@@ -21,7 +21,6 @@ import biped_configuration as config
 
 
 def formulate_biped(conf):
-
     w = conf.omega
     horizon_lenght = conf.horizon_lenght
     step_samples = conf.step_samples
@@ -192,5 +191,4 @@ def formulate_biped(conf):
 
 
 if __name__ == "__main__":
-
     formulation = formulate_biped(config)

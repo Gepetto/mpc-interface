@@ -286,7 +286,6 @@ class Constraint:
 
 class Box:
     def __init__(self, time_variant=None, how_to_update=None):
-
         self.constraints = []
 
         self.ts_vertices = np.array([])
@@ -321,7 +320,6 @@ class Box:
         time_variant=None,
         how_to_update=None,
     ):
-
         box = cls(time_variant, how_to_update)
 
         arrows, extremes, center = box_boundaries(vertices)
@@ -349,7 +347,6 @@ class Box:
         time_variant=None,
         how_to_update=None,
     ):
-
         box = cls(time_variant, how_to_update)
 
         arrows_SS, extremes_SS, center_SS = box_boundaries(vertices)
@@ -472,13 +469,11 @@ class Box:
         return feasible
 
     def scale_box(self, scale_factor):
-
         for boundary in self.constraints:
             boundary.update(extreme=boundary.extreme * scale_factor / self.scale_factor)
         self.scale_factor = scale_factor
 
     def set_safety_margin(self, margin):
-
         for boundary in self.constraints:
             boundary.update(
                 extreme=boundary.extreme - margin * np.linalg.norm(boundary.arrow)
