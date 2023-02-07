@@ -73,7 +73,6 @@ class Formulation:
         self.constraints.update({name: new_limits})
 
     def incorporate_box(self, name, new_box):
-
         for limit in new_box.constraints:
             for axis in limit.axes:
                 assert limit.variable + axis in self.definitions.keys(), (
@@ -84,7 +83,6 @@ class Formulation:
         self.constraint_boxes.update({name: new_box})
 
     def incorporate_goal(self, name, new_goal):
-
         for axis in new_goal.axes:
             assert new_goal.variable + axis in self.definitions.keys(), (
                 "All constrained variables must be previously defined, "
@@ -136,7 +134,6 @@ class Formulation:
         self.given_ID.update(dict(zip(self.given_variables, given_ranges)))
 
     def set_updating_rule(self, how_to_update=None):
-
         self.update_incorporations = how_to_update
 
     def update(self, **kargs):
@@ -156,7 +153,6 @@ class Formulation:
                 self.PM.update({variable: self.get_matrices_from_definition(variable)})
 
     def get_matrices_from_dynamics(self, variable):
-
         behavior = self.dynamics[self.of[variable]]
         Mg = np.zeros([behavior.all_variables[variable], self.given_len])
         Mo = np.zeros([behavior.all_variables[variable], self.optim_len])
@@ -177,7 +173,6 @@ class Formulation:
         return Mg, Mo
 
     def get_matrices_from_definition(self, variable):
-
         combination = self.definitions[variable]
         for i, var in enumerate(combination.keys()):
             if i == 0:
@@ -234,7 +229,6 @@ class Formulation:
         return value
 
     def generate_qp_constraint(self, limit, given):  # # requires updated limit
-
         rows = self.PM[limit.variable + limit.axes[0]][0].shape[0]
         nlines = limit.nlines
         c_rows = rows if nlines is None else nlines
@@ -264,7 +258,6 @@ class Formulation:
         return A, h
 
     def generate_qp_cost(self, cost, given):
-
         Q = np.zeros([self.optim_len, self.optim_len])
         q = np.zeros([self.optim_len, 1])
 
@@ -302,7 +295,6 @@ class Formulation:
         return Q, q
 
     def generate_all_qp_constraints(self, given):
-
         matrices = [
             self.generate_qp_constraint(limit, given)
             for area in self.constraints.values()
@@ -320,7 +312,6 @@ class Formulation:
         return A, h
 
     def generate_all_qp_costs(self, given):
-
         matrices = [self.generate_qp_cost(cost, given) for cost in self.goals.values()]
 
         Q = np.add.reduce([Q[0] for Q in matrices])

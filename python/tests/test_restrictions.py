@@ -16,7 +16,6 @@ from mpc_interface.restrictions import Constraint, Box
 
 class RestrictionsTestCase(unittest.TestCase):
     def setUp(self):
-
         arrowSet = [4, 7]
 
         limit1 = Constraint(variable="CoM", extreme=-10)
@@ -60,7 +59,6 @@ class RestrictionsTestCase(unittest.TestCase):
         self.arrowSet = arrowSet
 
     def test_constructor(self):
-
         with self.assertRaises(ValueError):
             Constraint(variable="CoM", extreme=10, axes=["_x", "_y"])
         with self.assertRaises(ValueError):
@@ -97,14 +95,12 @@ class RestrictionsTestCase(unittest.TestCase):
         self.assertTrue(self.limit6.nlines == self.limit6.t)
 
     def test_bound(self):
-
         self.assertEqual(self.limit1.bound(), self.limit1.extreme)
         self.assertEqual(self.limit2.bound(), self.limit2.extreme)
         self.assertEqual(self.limit3.bound(), -1)
         self.assertEqual(self.limit5.bound(), self.limit5.extreme)
 
     def test_update(self):
-
         self.limit1.update(extreme=[3.9, 2])  # as a result arrow with 2 rows
         self.assertEqual(self.limit1.arrow.shape[0], 2)
 
@@ -141,7 +137,6 @@ class RestrictionsTestCase(unittest.TestCase):
         self.limit4.update(L=np.ones([5, 10]))
 
     def test_SS_to_TS(self):
-
         L = np.array([[1, 3, 4], [0, 8, 1]])
         arrow = [0, 1]
         extreme = 3
@@ -164,7 +159,6 @@ class RestrictionsTestCase(unittest.TestCase):
         self.assertEqual(ots_points, ts_points)
 
     def test_is_feasible(self):
-
         self.assertTrue(not self.limit1.is_feasible(-20))
         self.assertTrue(self.limit1.is_feasible(9))
         self.assertTrue(self.limit1.is_feasible(-10 + 1e-6))
@@ -192,12 +186,10 @@ class RestrictionsTestCase(unittest.TestCase):
         )
 
     def test_box(self):
-
         vertices = np.array([[0, 1], [1, 0], [0, -1], [-1, 0]])
         SSbox = Box.state_space("CoM", vertices, ["_x"])
 
         for limit in SSbox.constraints:
-
             self.assertTrue(np.round(np.linalg.norm(limit.L), 8) == 1)
             self.assertTrue(limit.arrow in [1, -1])
             self.assertTrue(limit.extreme > 0)
@@ -211,7 +203,6 @@ class RestrictionsTestCase(unittest.TestCase):
         self.assertTrue(not all(TSbox.is_feasible(external_points, "TS")))
 
     def test_transformations(self):
-
         vertices = np.array([[0, 1], [1, 0], [0, -1], [-1, 0]])
         SSbox = Box.state_space("CoM", vertices, ["_x"])
 
@@ -277,7 +268,6 @@ class RestrictionsTestCase(unittest.TestCase):
 
 
 if __name__ == "__main__":
-
     unittest.main()
 
     # FOR MANUAL TEST

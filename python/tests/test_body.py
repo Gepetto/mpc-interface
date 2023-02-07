@@ -20,7 +20,6 @@ from mpc_interface.combinations import LineCombo
 
 class BodyTestCase(unittest.TestCase):
     def setUp(self):
-
         LIP = ControlSystem.from_name("J->CCC", tau=0.1, omega=3.5, axes=["_x", "_y"])
         LIP_ext = ExtendedSystem.from_cotrol_system(LIP, "x", 9)
         LIP_ext.define_output("DCM", {"CoM": 1, "CoM_dot": 1 / 3.5})
@@ -98,7 +97,6 @@ class BodyTestCase(unittest.TestCase):
         self.body = body
 
     def test_incorporations(self):
-
         self.assertTrue("steps" in self.body.dynamics.keys())
         self.assertTrue(isinstance(self.body.dynamics["steps"], ExtendedSystem))
 
@@ -116,7 +114,6 @@ class BodyTestCase(unittest.TestCase):
         self.assertTrue(isinstance(self.body.definitions["DCM_y"], LineCombo))
 
     def test_qp_problem(self):
-
         self.body.identify_qp_domain(self.optimization_domain)
 
         self.assertEqual(self.body.optim_variables, self.optimization_domain)
@@ -163,7 +160,6 @@ class BodyTestCase(unittest.TestCase):
 
 
 if __name__ == "__main__":
-
     unittest.main()
 
     # FOR MANUAL TEST

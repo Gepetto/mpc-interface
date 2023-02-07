@@ -234,7 +234,6 @@ def visual_inspection(ext_system):
     norm = colors.BoundaryNorm(bounds, cmap.N)
 
     for state, sID in ext_system.state_ID.items():
-
         if state[-2:] == "_x":
             print(
                 "\t" * 4
