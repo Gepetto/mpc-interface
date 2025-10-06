@@ -14,11 +14,11 @@ namespace tools {
 using namespace Eigen;
 
 ControlSystem::ControlSystem(
-    std::vector<std::string> &input_names,
-    std::vector<std::string> &state_names, Eigen::MatrixXd &A,
-    Eigen::MatrixXd &B, std::vector<std::string> &axes,
+    std::vector<std::string>& input_names,
+    std::vector<std::string>& state_names, Eigen::MatrixXd& A,
+    Eigen::MatrixXd& B, std::vector<std::string>& axes,
     std::function<void(std::shared_ptr<ExtendedSystem> shr_ext_sys,
-                       std::map<std::string, int> &kargs)>
+                       std::map<std::string, int>& kargs)>
         how_to_update_matrices,
     bool time_variant) {
   input_names_ = input_names;
@@ -32,16 +32,16 @@ ControlSystem::ControlSystem(
 }
 
 void ControlSystem::update_matrices(std::shared_ptr<ExtendedSystem> shr_ext_sys,
-                                    std::map<std::string, int> &kargs) {
+                                    std::map<std::string, int>& kargs) {
   how_to_update_matrices_(shr_ext_sys, kargs);
 }
 
 ExtendedSystem::ExtendedSystem(
-    std::vector<std::string> &input_names,
-    std::vector<std::string> &state_names, std::string &state_vector_name,
-    Tensor<double, 3> S, Tensor<double, 4> U, std::vector<std::string> &axes,
-    std::function<void(Eigen::Tensor<double, 3> &A, Eigen::Tensor<double, 4> &B,
-                       unsigned int, Eigen::MatrixXd &, Eigen::MatrixXd &)>
+    std::vector<std::string>& input_names,
+    std::vector<std::string>& state_names, std::string& state_vector_name,
+    Tensor<double, 3> S, Tensor<double, 4> U, std::vector<std::string>& axes,
+    std::function<void(Eigen::Tensor<double, 3>& A, Eigen::Tensor<double, 4>& B,
+                       unsigned int, Eigen::MatrixXd&, Eigen::MatrixXd&)>
         how_to_update_ext_matrices,
     bool time_variant)
     : matrices_(U_, S_) {
@@ -73,8 +73,8 @@ ExtendedSystem::ExtendedSystem(
 
 // }
 
-void ExtendedSystem::identify_domain(std::vector<std::string> &input_name,
-                                     std::vector<std::string> &state_names) {
+void ExtendedSystem::identify_domain(std::vector<std::string>& input_name,
+                                     std::vector<std::string>& state_names) {
   /// Build domain ID
   std::map<std::string, int> ldomain_ID;
   for (std::size_t i = 0; i < input_name.size(); i++)
