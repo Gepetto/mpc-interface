@@ -25,19 +25,19 @@ template <typename T>
 using MatrixType = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
 
 template <typename Scalar, int rank, typename sizeType>
-auto Tensor_to_Matrix(const Eigen::Tensor<Scalar, rank> &tensor,
+auto Tensor_to_Matrix(const Eigen::Tensor<Scalar, rank>& tensor,
                       const sizeType rows, const sizeType cols) {
   return Eigen::Map<const MatrixType<Scalar>>(tensor.data(), rows, cols);
 }
 
 template <typename Scalar, typename... Dims>
-auto Matrix_to_Tensor(const MatrixType<Scalar> &matrix, Dims... dims) {
+auto Matrix_to_Tensor(const MatrixType<Scalar>& matrix, Dims... dims) {
   constexpr int rank = sizeof...(Dims);
   return Eigen::TensorMap<Eigen::Tensor<const Scalar, rank>>(matrix.data(),
                                                              {dims...});
 }
 
-void display(Tensor<double, 3> &aT) {
+void display(Tensor<double, 3>& aT) {
   std::cout << "(" << aT.dimension(0) << "," << aT.dimension(1) << ","
             << aT.dimension(2) << ")=[";
   for (Index i0 = 0; i0 < aT.dimension(0); i0++) {
@@ -57,7 +57,7 @@ void display(Tensor<double, 3> &aT) {
   std::cout << "]" << std::endl;
 }
 
-void display(Tensor<double, 4> &aT) {
+void display(Tensor<double, 4>& aT) {
   std::cout << "(" << aT.dimension(0) << "," << aT.dimension(1) << ","
             << aT.dimension(2) << "," << aT.dimension(3) << ")=[";
   for (Index i0 = 0; i0 < aT.dimension(0); i0++) {
@@ -80,8 +80,8 @@ void display(Tensor<double, 4> &aT) {
   }
   std::cout << "]" << std::endl;
 }
-void extend_matrices(Eigen::Tensor<double, 3> &S, Eigen::Tensor<double, 4> &U,
-                     unsigned int N, Eigen::MatrixXd &A, Eigen::MatrixXd &B) {
+void extend_matrices(Eigen::Tensor<double, 3>& S, Eigen::Tensor<double, 4>& U,
+                     unsigned int N, Eigen::MatrixXd& A, Eigen::MatrixXd& B) {
   Index n = B.rows();
   Index m = B.cols();
 
@@ -144,9 +144,9 @@ void extend_matrices(Eigen::Tensor<double, 3> &S, Eigen::Tensor<double, 4> &U,
 }
 
 void update_step_matrices(std::shared_ptr<ExtendedSystem> /*shr_ext_sys*/,
-                          std::map<std::string, double> & /*kargs*/) {}
+                          std::map<std::string, double>& /*kargs*/) {}
 
-void get_system_matrices(std::string & /*system*/) {}
+void get_system_matrices(std::string& /*system*/) {}
 
 }  // namespace tools
 }  // namespace gecko

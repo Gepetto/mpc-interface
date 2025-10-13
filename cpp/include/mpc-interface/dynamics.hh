@@ -33,16 +33,16 @@ class ExtendedSystem;
 
 class ControlSystem {
  public:
-  ControlSystem(std::vector<std::string> &input_names,
-                std::vector<std::string> &state_names, Eigen::MatrixXd &A,
-                Eigen::MatrixXd &B, std::vector<std::string> &axes,
+  ControlSystem(std::vector<std::string>& input_names,
+                std::vector<std::string>& state_names, Eigen::MatrixXd& A,
+                Eigen::MatrixXd& B, std::vector<std::string>& axes,
                 std::function<void(std::shared_ptr<ExtendedSystem> shr_ext_sys,
-                                   std::map<std::string, int> &kargs)>
+                                   std::map<std::string, int>& kargs)>
                     how_to_update_matrices,
                 bool time_variant = false);
 
   void update_matrices(std::shared_ptr<ExtendedSystem> shr_ext_sys,
-                       std::map<std::string, int> &kargs);
+                       std::map<std::string, int>& kargs);
 
  protected:
   /// Store the names of the inputs
@@ -64,7 +64,7 @@ class ControlSystem {
 
   /// Ref to method to call
   std::function<void(std::shared_ptr<ExtendedSystem> shr_ext_sys,
-                     std::map<std::string, int> &kargs)>
+                     std::map<std::string, int>& kargs)>
       how_to_update_matrices_;
 };
 /// *{
@@ -83,17 +83,17 @@ class ExtendedSystem {
  public:
   /// Constructor
   ExtendedSystem(
-      std::vector<std::string> &input_names,
-      std::vector<std::string> &state_names, std::string &state_vector_name,
+      std::vector<std::string>& input_names,
+      std::vector<std::string>& state_names, std::string& state_vector_name,
       Eigen::Tensor<double, 3> S, Eigen::Tensor<double, 4> U,
-      std::vector<std::string> &axis,
-      std::function<void(Eigen::Tensor<double, 3> &, Eigen::Tensor<double, 4> &,
-                         unsigned int, Eigen::MatrixXd &, Eigen::MatrixXd &)>
+      std::vector<std::string>& axis,
+      std::function<void(Eigen::Tensor<double, 3>&, Eigen::Tensor<double, 4>&,
+                         unsigned int, Eigen::MatrixXd&, Eigen::MatrixXd&)>
           how_to_update_ext_matrices,
       bool time_variant = true);
 
-  void identify_domain(std::vector<std::string> &input_name,
-                       std::vector<std::string> &state_names);
+  void identify_domain(std::vector<std::string>& input_name,
+                       std::vector<std::string>& state_names);
 
  protected:
   /// Store the list of axis.
@@ -131,10 +131,10 @@ class ExtendedSystem {
   bool time_variant_;
 
   /// Matrices is a tuple of tensors
-  std::tuple<Eigen::Tensor<double, 4> &, Eigen::Tensor<double, 3> &> matrices_;
+  std::tuple<Eigen::Tensor<double, 4>&, Eigen::Tensor<double, 3>&> matrices_;
 
-  std::function<void(Eigen::Tensor<double, 3> &A, Eigen::Tensor<double, 4> &B,
-                     unsigned int, Eigen::MatrixXd &, Eigen::MatrixXd &)>
+  std::function<void(Eigen::Tensor<double, 3>& A, Eigen::Tensor<double, 4>& B,
+                     unsigned int, Eigen::MatrixXd&, Eigen::MatrixXd&)>
       how_to_update_ext_matrices_;
 
   /// Populate the all_variables member.
