@@ -6,7 +6,6 @@ Created on Fri Mar  4 10:22:35 2022
 @author: nvilla
 """
 
-
 import unittest
 
 import numpy as np

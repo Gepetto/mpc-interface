@@ -5,6 +5,7 @@ Created on Sun Jan 17 17:04:15 2021
 
 @author: nvilla
 """
+
 import numpy as np
 import scipy.spatial as sp
 import mpc_interface.tools as use
