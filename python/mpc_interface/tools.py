@@ -5,6 +5,7 @@ Created on Tue Feb  1 19:45:36 2022
 
 @author: nvilla
 """
+
 import numpy as np
 import sympy as sy
 
